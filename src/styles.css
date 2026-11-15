@@ -484,6 +484,7 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .ctafel.gedreht th:first-child { width: 20%; }
 .ctafel.gedreht th.cname { text-align: center !important; padding: 0 4px 2px !important; }
 .ctafel.gedreht th.cname.amzug { color: var(--akzent); }
+.ctafel.gedreht .legs-oben { display: block; color: var(--akzent); font-size: 1.5em; font-weight: 800; line-height: 1.1; }
 .ctafel.gedreht th.cnr { font-size: 15px; text-align: center; }
 .ctafel.gedreht th.cnr.zu { text-decoration: line-through; opacity: .45; }
 .ctafel.gedreht td.amzug { background: #2e2a14; }
@@ -491,7 +492,8 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 @media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
   .ctafel.normal { display: none; }
   .ctafel.gedreht { display: table; }
-  .ctafel.gedreht td { height: 38px; font-size: 26px; }
-  .ctafel.gedreht th.cnr { font-size: 18px; }
-  .ctafel.gedreht .cpkt { font-size: 20px !important; }
+  .ctafel.gedreht td { height: 48px; font-size: 32px; }
+  .ctafel.gedreht th.cname { font-size: 20px !important; }
+  .ctafel.gedreht th.cnr { font-size: 22px; }
+  .ctafel.gedreht .cpkt { font-size: 24px !important; }
 }

@@ -80,7 +80,8 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
           <th />
           {match.spieler.map((name, i) => (
             <th key={i} className={'cname' + (am(i) ? ' amzug' : '')}>
-              {name}{match.legs.length > 1 || siege[i] ? <span className="legs"> · {siege[i]}</span> : null}
+              {(match.legs.length > 1 || siege.some(Boolean)) && <span className="legs-oben">{siege[i]}</span>}
+              {name}
             </th>
           ))}
         </tr>
