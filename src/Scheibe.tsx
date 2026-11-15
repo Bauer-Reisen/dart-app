@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   ORDER, RADIUS, hitAt, hitPath, polar, sector, segAngle, zielPath,
   type Hit, type Ziel,
@@ -14,7 +14,6 @@ const FARBE = {
 
 interface Props {
   ziel: Ziel;
-  zoom: boolean;
   flash: { hit: Hit; key: number; punkt?: [number, number] } | null;
   /** punkt = getippte Stelle in Bildschirm-Koordinaten der Scheibe */
   onHit: (h: Hit, punkt: [number, number]) => void;
@@ -27,22 +26,10 @@ const GANZ: Ansicht = { cx: 0, cy: 0, w: 400, h: 400 };
 const MIN_W = 90;       // weiter rein geht es nicht
 const RAND = 220;       // so weit darf die Mitte von der Scheibenmitte weg
 
-/**
- * Ausschnitt der Lupe: Die Scheibe bleibt, wie sie an der Wand hängt.
- * Es wird nur auf die Stelle des Ziels vergrößert (Ziel in der Mitte, Nachbarn drumherum).
- */
-function lupenAnsicht(ziel: Ziel): Ansicht {
-  if (ziel.seg === 25) return { cx: 0, cy: 0, w: 240, h: 300 };
-  const r = ziel.ring === 'D' ? (RADIUS.SO + RADIUS.D) / 2 : ziel.ring === 'T' ? (RADIUS.SI + RADIUS.T) / 2 : (RADIUS.T + RADIUS.SO) / 2;
-  const w = ziel.ring === 'D' ? 170 : ziel.ring === 'T' ? 180 : 230;
-  const [cx, cy] = polar(r, segAngle(ziel.seg));
-  return { cx, cy, w, h: w * 1.25 };
-}
-
 const vbText = (a: Ansicht) =>
   `${(a.cx - a.w / 2).toFixed(1)} ${(a.cy - a.h / 2).toFixed(1)} ${a.w.toFixed(1)} ${a.h.toFixed(1)}`;
 
-export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
+export function Scheibe({ ziel, flash, onHit }: Props) {
   const g = useRef<SVGGElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const rot = 0; // nie drehen: die Scheibe sieht immer aus wie in echt
@@ -80,11 +67,9 @@ export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
     );
   });
 
-  // Eigener Ausschnitt aus Zwei-Finger-Zoom; null = Standard (ganze Scheibe oder Lupe aufs Ziel).
-  // Die Lupe (an/aus) setzt ihn zurück. Neue Ziele ändern ihn nicht – sonst spränge das Bild nach jedem Dart.
+  // Ausschnitt aus Zwei-Finger-Zoom; null = ganze Scheibe. Bleibt nach jedem Dart stehen.
   const [eigen, setEigen] = useState<Ansicht | null>(null);
-  useEffect(() => { setEigen(null); }, [zoom]);
-  const ansicht = eigen ?? (zoom ? lupenAnsicht(ziel) : GANZ);
+  const ansicht = eigen ?? GANZ;
 
   // Ein Finger tippt (zählt beim Loslassen), zwei Finger ziehen auf/zu und verschieben.
   const finger = useRef(new Map<number, [number, number]>());

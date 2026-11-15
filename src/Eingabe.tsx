@@ -56,7 +56,6 @@ export function useEingabe(o: EingabeOpts) {
   const [override, setOverride] = useState<Ziel | null>(o.zielBleibt ? gemerkt?.ziel ?? null : null);
   const [ersetzen, setErsetzen] = useState<number | null>(null);
   const [flash, setFlash] = useState<{ hit: Hit; key: number; punkt?: [number, number] } | null>(null);
-  const [zoom, setZoom] = useState(false);
   const [wahlOffen, setWahlOffen] = useState(false);
   const [trainingChips, setTrainingChips] = useState<Ziel[]>(gemerkt?.chips?.length ? gemerkt.chips : o.startChips ?? []);
   const timer = useRef<number | undefined>(undefined);
@@ -166,11 +165,11 @@ export function useEingabe(o: EingabeOpts) {
 
   return {
     zielAnzeige: o.zielAnzeige ?? 'wahl',
-    darts, zuletzt, ziel, vorschlag, chips, ersetzen, flash, zoom, wahlOffen,
+    darts, zuletzt, ziel, vorschlag, chips, ersetzen, flash, wahlOffen,
     treffer, abpraller, dreiGleich, rueckgaengig, feldAntippen,
     chipWaehlen: (z: Ziel) => setOverride(o.zielBleibt || !sameZiel(z, vorschlag) ? z : null),
     zielSetzen,
-    setZoom, setWahlOffen,
+    setWahlOffen,
     /** Offene Darts verwerfen (z. B. beim Verlassen). */
     zuruecksetzen: () => { setDarts([]); setZuletzt(null); setErsetzen(null); setOverride(null); },
   };
@@ -232,19 +231,11 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
             </button>
           );
         })}
-        <button
-          className={'icon zoom' + (e.zoom ? ' an' : '')}
-          onClick={() => e.setZoom(!e.zoom)}
-          disabled={e.ziel.seg === 25}
-          aria-label="Zoom auf das Ziel"
-        >
-          🔍
-        </button>
         {t.knopf}
       </div>
 
       <main className="flaeche">
-        <Scheibe ziel={e.ziel} zoom={e.zoom} flash={e.flash} onHit={e.treffer} />
+        <Scheibe ziel={e.ziel} flash={e.flash} onHit={e.treffer} />
         {e.flash && <div key={e.flash.key} className="ansage">{hitLabelLang(e.flash.hit)}</div>}
         {e.ersetzen !== null && <div className="hinweis-oben">Tippe das richtige Feld für Dart {e.ersetzen + 1}</div>}
       </main>

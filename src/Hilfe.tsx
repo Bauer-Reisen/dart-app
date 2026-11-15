@@ -17,10 +17,10 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
-    v: '0.8.6', titel: 'Scheibe mit zwei Fingern zoomen',
+    v: '0.8.7', titel: 'Scheibe mit zwei Fingern zoomen',
     punkte: [
       <>Zieh die Scheibe mit <b>zwei Fingern auf und zu</b> und verschieb sie – wie bei Fotos. Ganz zuziehen zeigt wieder die ganze Scheibe.</>,
-      <>Ein Dart zählt jetzt, sobald du den Finger <b>loslässt</b>. Die Lupe 🔍 springt weiter mit einem Tippen direkt aufs Ziel.</>,
+      <>Ein Dart zählt jetzt, sobald du den Finger <b>loslässt</b>. Die Lupe 🔍 braucht es dafür nicht mehr.</>,
     ],
   },
   {
