@@ -428,3 +428,6 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; color:
 .nuliga-zeile .btn { flex: none; width: 44px; height: 40px; font-size: 18px; }
 .wahlliste .zeile-spieltag { grid-template-columns: 1fr auto; }
 .wahlliste .zeile-spieltag .wer { white-space: normal; }
+.spiel-notiz { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; font-size: 14px; color: var(--text); background: var(--fl2); border: 1px solid #3a3a3a; border-radius: 8px; padding: 6px 8px; user-select: text; -webkit-user-select: text; }
+.liga-spiel > div { flex: 1; min-width: 0; }
+a.btn.breit { justify-content: center; box-sizing: border-box; }

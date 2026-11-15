@@ -1,11 +1,12 @@
 // Reiter „Tipps": Themen zum Aufklappen und Checkout-Tabelle.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { checkout, wegText } from './checkout';
 import { THEMEN } from './tipps';
 
 export function Tipps() {
   const [offen, setOffen] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
+  useEffect(() => { window.scrollTo(0, 0); }, [offen]);
 
   const tabelle = useMemo(() => {
     const zeilen: { rest: number; weg: string | null }[] = [];

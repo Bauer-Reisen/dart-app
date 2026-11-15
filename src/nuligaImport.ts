@@ -24,6 +24,21 @@ export async function nuLigaHolen<T = any>(pfad: string, params: Record<string, 
   return j as T;
 }
 
+/** Saison wie bei nuLiga, z. B. "2026/27" (Wechsel im Juli). */
+export function saison(jetzt = new Date()): string {
+  const j = jetzt.getMonth() >= 6 ? jetzt.getFullYear() : jetzt.getFullYear() - 1;
+  return `${j}/${String((j + 1) % 100).padStart(2, '0')}`;
+}
+
+/** Link zur eigenen Liga: bei nuLiga-Verbindung die Staffel-Seite, sonst der selbst eingetragene Link. */
+export function ligaLink(d: LigaDaten): string | null {
+  if (d.nuliga) {
+    const ch = encodeURIComponent(`${d.nuliga.region} ${saison()}`).replace(/%20/g, '+');
+    return `https://bdv-dart.liga.nu/cgi-bin/WebObjects/nuLigaDARTDE.woa/wa/groupPage?championship=${ch}&group=${d.nuliga.staffel}`;
+  }
+  return d.link?.startsWith('http') ? d.link : null;
+}
+
 const norm = (n: string) => n.trim().toLowerCase().replace(/\s+/g, ' ');
 /** "Muster, Max" passt zu "Max Muster", "muster" usw. */
 function gleicherName(a: string, b: string): boolean {

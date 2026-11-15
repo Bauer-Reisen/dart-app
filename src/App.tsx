@@ -32,6 +32,9 @@ export function App() {
     } catch { return 'training'; }
   });
 
+  // Jede neue Seite beginnt oben (sonst bleibt die Scroll-Position der vorigen Seite stehen)
+  useEffect(() => { window.scrollTo(0, 0); }, [ansicht]);
+
   // Bildschirm anlassen, solange die App offen ist
   useEffect(() => {
     let lock: { release: () => Promise<void> } | null = null;
@@ -122,6 +125,7 @@ export function App() {
             setMatch('x01', computerMatch(avg, legs));
             setAnsicht({ seite: 'spiel', art: 'x01' });
           }}
+          laufend={matches.x01?.computer ? { avg: matches.x01.computer.avg, onWeiter: () => setAnsicht({ seite: 'spiel', art: 'x01' }) } : undefined}
         />
       ) : (
         <Start

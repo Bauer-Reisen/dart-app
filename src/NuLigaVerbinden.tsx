@@ -36,6 +36,8 @@ export function NuLigaVerbinden({ onFertig, onAbbruch }: { onFertig: (v: NuLigaV
     return () => { aktiv = false; };
   }, [schritt, region, staffel, team]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, [schritt]);
+
   function zurueck() {
     if (team) setTeam(null);
     else if (staffel) setStaffel(null);

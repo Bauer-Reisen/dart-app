@@ -1,6 +1,6 @@
 // Liga-Reiter: nächster Spieltag, Vorbereitungsplan, Computer-Gegner, Ergebnisse, Gegner.
 import { useEffect, useState, type ReactNode } from 'react';
-import { nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort } from './nuligaImport';
+import { ligaLink, nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort } from './nuligaImport';
 import { NuLigaVerbinden } from './NuLigaVerbinden';
 import {
   bilanz, datumText, doppelQuote, gegnerNamen, gegnerVerlauf, gewonnen, heuteText, letzterSpieltag, ligaLaden,
@@ -14,6 +14,8 @@ interface Props {
   onTraining: () => void;
   onNeu: (art: SpielArt) => void;
   onComputer: (avg: number, legsZiel: number) => void;
+  /** Laufendes Spiel gegen den Computer (zum Fortsetzen). */
+  laufend?: { avg: number; onWeiter: () => void };
 }
 
 const TAG = 86400000;
@@ -29,7 +31,7 @@ function countdown(tage: number): string {
   return `noch ${tage} Tage`;
 }
 
-export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
+export function Liga({ aufnahmen, onTraining, onNeu, onComputer, laufend }: Props) {
   const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden());
   const [bearbeiten, setBearbeiten] = useState<Spieltag | null>(null);
   const [verbinden, setVerbinden] = useState(false);
@@ -64,6 +66,9 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
     if (v && (!v.stand || Date.now() - v.stand > 3 * 3600000)) aktualisieren(daten);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Beim Wechsel zwischen Übersicht, Verbinden und Spieltag immer oben anfangen
+  useEffect(() => { window.scrollTo(0, 0); }, [verbinden, bearbeiten?.id]);
 
   if (verbinden) {
     return (
@@ -140,6 +145,13 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
       )}
       {meldung && <p className="info klein">{meldung}</p>}
 
+      {laufend && (
+        <button className="kachel weiter" onClick={laufend.onWeiter}>
+          <b>▶ Spiel gegen den Computer fortsetzen</b>
+          <span>Computer Ø {laufend.avg}</span>
+        </button>
+      )}
+
       {!daten.spieltage.length && !daten.nuliga && (
         <div className="karte">
           <p>Du spielst in einer Liga? Dann plant die App deine Vorbereitung bis zum nächsten Spieltag und stellt den Computer-Gegner auf die Stärke der Gegner ein.</p>
@@ -184,17 +196,20 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
         />
       )}
 
-      <h3>Gegen den Computer üben ({bestOf(legs)}, 501 Doppel-Aus)</h3>
-      {computerKnoepfe}
-      <p className="info klein">
-        {st.geschaetzt
-          ? 'Geschätzt aus deinem Training. Trag beim Spieltag die Averages der Gegner ein, dann passt der Computer genau.'
-          : `Eingestellt auf die Gegner von ${naechster?.gegner}.`}
-      </p>
+      {/* In der Woche vor dem Spieltag stehen die Knöpfe schon im Plan */}
+      {(tage === null || phase(tage) !== 'simulation') && <>
+        <h3>Gegen den Computer üben ({bestOf(legs)}, 501 Doppel-Aus)</h3>
+        {computerKnoepfe}
+        <p className="info klein">
+          {st.geschaetzt
+            ? 'Geschätzt aus deinem Training. Sobald die Averages der Gegner bekannt sind, passt sich der Computer an.'
+            : `Eingestellt auf die Gegner von ${naechster?.gegner}.`}
+        </p>
+      </>}
 
       <Saison daten={daten} trainingAvg={tr.avg} />
 
-      <h3>Spieltage</h3>
+      {daten.spieltage.length > 0 && <h3>Spieltage</h3>}
       {sortiert(daten.spieltage).map((s) => {
         const t = tageBis(s.datum, jetzt);
         const ein = s.spiele.filter((x) => x.art === 'einzel');
@@ -211,7 +226,7 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
           </button>
         );
       })}
-      <button className="btn breit" onClick={neuerSpieltag}>＋ Spieltag</button>
+      {daten.spieltage.length > 0 && <button className="btn breit" onClick={neuerSpieltag}>＋ Spieltag von Hand</button>}
 
       <Gegner daten={daten} />
 
@@ -226,26 +241,31 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
             Trennen
           </button>
         </div>
-      ) : (
+      ) : daten.spieltage.length > 0 ? (
+        // Oben steht der Knopf nur, solange noch nichts eingetragen ist – sonst hier
         <button className="btn breit" onClick={() => setVerbinden(true)}>📡 Mit meiner Liga verbinden (nuLiga)</button>
-      )}
+      ) : null}
       <p className="info klein">Länge eines Spiels in deiner Liga</p>
       <div className="ringwahl">
         {[2, 3, 4].map((k) => (
           <button key={k} className={'btn' + (legs === k ? ' an' : '')} onClick={() => setzen({ ...daten, legsZiel: k })}>{bestOf(k)}</button>
         ))}
       </div>
-      <p className="info klein">Seite deiner Liga (z. B. bei nuLiga), zum schnellen Nachschauen</p>
-      <div className="spielerzeile">
-        <input
-          type="url"
-          inputMode="url"
-          placeholder="https://…"
-          value={daten.link ?? ''}
-          onChange={(e) => setzen({ ...daten, link: e.target.value.trim() || undefined })}
-        />
-        {daten.link?.startsWith('http') && <a className="btn" href={daten.link} target="_blank" rel="noreferrer">Öffnen ↗</a>}
-      </div>
+      {daten.nuliga ? (
+        <a className="btn breit" href={ligaLink(daten)!} target="_blank" rel="noreferrer">Tabelle und Spielberichte bei nuLiga ↗</a>
+      ) : <>
+        <p className="info klein">Seite deiner Liga, zum schnellen Nachschauen</p>
+        <div className="spielerzeile">
+          <input
+            type="url"
+            inputMode="url"
+            placeholder="https://…"
+            value={daten.link ?? ''}
+            onChange={(e) => setzen({ ...daten, link: e.target.value.trim() || undefined })}
+          />
+          {daten.link?.startsWith('http') && <a className="btn" href={daten.link} target="_blank" rel="noreferrer">Öffnen ↗</a>}
+        </div>
+      </>}
       <p className="info klein">Alle Liga-Daten liegen nur auf diesem Gerät und werden mit „Als Datei sichern" (Statistik) mitgesichert.</p>
     </div>
   );
@@ -448,6 +468,8 @@ function SpieltagSeite({ st, daten, neu, onFertig, onLoeschen }: {
   const [formOffen, setFormOffen] = useState(false);
   const vorbei = tageBis(s.datum) <= 0;
   const legs = daten.legsZiel;
+  const vonNuLiga = s.id.startsWith('nu-');
+  const link = ligaLink(daten);
 
   function speichern() {
     if (!s.gegner.trim()) {
@@ -464,6 +486,20 @@ function SpieltagSeite({ st, daten, neu, onFertig, onLoeschen }: {
         <h2>{neu ? 'Neuer Spieltag' : 'Spieltag'}</h2>
       </div>
 
+      {vonNuLiga ? (
+        <div className="karte">
+          <b>{s.heim ? `Daheim gegen ${s.gegner}` : `Auswärts bei ${s.gegner}`}</b>
+          <p className="info">
+            {datumText(s.datum)}{s.zeit ? `, ${s.zeit} Uhr` : ''}
+            {s.ergebnis && <><br />Mannschaftsergebnis: <b>{s.ergebnis}</b></>}
+            {s.avgVon && s.avgBis && <><br />Gegner spielen zwischen Ø {s.avgVon} und Ø {s.avgBis}</>}
+          </p>
+          <p className="info klein">
+            Kommt automatisch aus deiner Liga (nuLiga).{' '}
+            {link && <a href={link} target="_blank" rel="noreferrer">Liga-Seite öffnen ↗</a>}
+          </p>
+        </div>
+      ) : <>
       <h3>Gegnerische Mannschaft</h3>
       <div className="spielerzeile">
         <input value={s.gegner} maxLength={40} placeholder="z. B. DC Musterstadt" onChange={(e) => setS({ ...s, gegner: e.target.value })} />
@@ -488,8 +524,9 @@ function SpieltagSeite({ st, daten, neu, onFertig, onLoeschen }: {
       </div>
       <p className="info klein">
         Steht im Spielbericht oder in der Spieler-Rangliste deiner Liga. Danach richtet sich die Stärke des Computer-Gegners.
-        {daten.link?.startsWith('http') && <> <a href={daten.link} target="_blank" rel="noreferrer">Liga-Seite öffnen ↗</a></>}
+        {link && <> <a href={link} target="_blank" rel="noreferrer">Liga-Seite öffnen ↗</a></>}
       </p>
+      </>}
 
       {(vorbei || s.spiele.length > 0) && <>
         <h3>Deine Spiele an diesem Abend</h3>
@@ -498,12 +535,21 @@ function SpieltagSeite({ st, daten, neu, onFertig, onLoeschen }: {
             <div>
               <b>{sp.legsIch}:{sp.legsGegner}</b> {sp.art === 'doppel' ? 'Doppel ' : ''}gegen {sp.gegner || '?'}
               {sp.average ? <span className="klein"> · Ø {sp.average.toFixed(2).replace('.', ',')}</span> : null}
-              {sp.notiz && <div className="klein">📝 {sp.notiz}</div>}
+              <input
+                className="spiel-notiz"
+                value={sp.notiz ?? ''}
+                maxLength={200}
+                placeholder="📝 Notiz zum Gegner (z. B. wirft schnell)"
+                onChange={(e) => setS({ ...s, spiele: s.spiele.map((x) => (x.id === sp.id ? { ...x, notiz: e.target.value || undefined } : x)) })}
+              />
             </div>
-            <button className="btn" aria-label="Spiel löschen" onClick={() => setS({ ...s, spiele: s.spiele.filter((x) => x.id !== sp.id) })}>✕</button>
+            {!sp.id.startsWith('nu-') && (
+              <button className="btn" aria-label="Spiel löschen" onClick={() => setS({ ...s, spiele: s.spiele.filter((x) => x.id !== sp.id) })}>✕</button>
+            )}
           </div>
         ))}
-        {formOffen ? (
+        {vonNuLiga && !s.spiele.length && <p className="info klein">Für dich ist an diesem Abend kein Spiel im Spielbericht.</p>}
+        {vonNuLiga && s.spiele.some((x) => x.id.startsWith('nu-')) ? null : formOffen ? (
           <SpielFormular
             legs={legs}
             daten={daten}
@@ -526,7 +572,7 @@ function SpieltagSeite({ st, daten, neu, onFertig, onLoeschen }: {
       </>}
 
       <button className="btn gross los an" onClick={speichern}>Speichern</button>
-      {!neu && (
+      {!neu && !vonNuLiga && (
         <button className="btn warn breit" onClick={() => { if (confirm('Diesen Spieltag mit allen Ergebnissen löschen?')) onLoeschen(); }}>
           Spieltag löschen
         </button>
