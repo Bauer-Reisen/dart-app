@@ -1,0 +1,7 @@
+node_modules
+dist
+.privat-woerter.txt
+# Notizen nur auf diesem PC (enthalten Vereins-/Personenbezug)
+STAND.md
+VORSCHLAG.md
+.wrangler

@@ -1,0 +1,16 @@
+# Cloudflare Worker „Liga-Vermittler" für die Dart-App. Hier steht nichts Geheimes.
+name = "dart-app-liga"
+main = "index.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+# Nur diese Websites dürfen den Worker benutzen (durch Komma getrennt).
+ALLOWED_ORIGINS = "https://bauer-reisen.github.io,http://localhost:5700"
+
+# Schutz vor Missbrauch: höchstens 60 Anfragen pro Minute und Gerät
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "2001"
+  [ratelimits.simple]
+  limit = 60
+  period = 60
