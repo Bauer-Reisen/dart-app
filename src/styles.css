@@ -449,3 +449,20 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .feld .nr { position: absolute; top: 3px; left: 6px; font-size: 11px; font-weight: 600; color: var(--leise); }
 .feld.naechster { box-shadow: inset 0 0 0 2px var(--leise); }
 .dartfolge { margin-top: 8px; }
+
+/* Spieler-Auswahl */
+.spieler-leiste { display: flex; justify-content: space-between; align-items: center; width: 100%; background: var(--fl); border: 1px solid var(--fl2); border-radius: 12px; padding: 12px 14px; margin: 0 0 12px; text-align: left; }
+.spieler-leiste .wechsel { color: var(--akzent); font-size: 14px; }
+.spieler-liste { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.spieler-zeile { display: flex; gap: 6px; align-items: stretch; margin: 6px 0; }
+.spieler-zeile .name { flex: 1; text-align: left; background: var(--fl2); border: 0; border-radius: 10px; padding: 12px; }
+.spieler-zeile.an .name { background: var(--akzent); color: #111; font-weight: 700; }
+.spieler-zeile input { flex: 1; min-width: 0; background: var(--fl2); color: var(--text); border: 1px solid var(--fl2); border-radius: 10px; padding: 10px; font: inherit; -webkit-user-select: text; user-select: text; }
+.spieler-zeile .btn { min-width: 48px; }
+.schnell-spieler { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.trainings-vorschlag { background: var(--fl); border: 2px solid var(--akzent); border-radius: 14px; padding: 14px; margin: 0 0 14px; }
+.trainings-vorschlag h3 { margin: 0 0 6px; }
+.trainings-vorschlag p { margin: 4px 0; }
+.trainings-vorschlag .fokus { color: var(--akzent); }
+.fokus-leiste { background: var(--fl); padding: 6px 12px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.fokus-leiste b { color: var(--akzent); }

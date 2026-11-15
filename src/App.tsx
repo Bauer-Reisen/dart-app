@@ -10,6 +10,9 @@ import { CricketSpiel } from './SpielCricket';
 import { HalveItSpiel } from './SpielHalveIt';
 import { AtcSpiel, BobsSpiel, DoppelSpiel } from './SpielUebungen';
 import { laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match, type SpielArt } from './speicher';
+import { alleSpieler, matchUmbenennen, spielerLaden, spielerSpeichern, umbenennen, type SpielerStand } from './spieler';
+import { SpielerFenster } from './SpielerWahl';
+import { fuehrungLaden, fuehrungSpeichern, type Fuehrung } from './fuehrung';
 
 type Ansicht =
   | { seite: 'start' | 'training' }
@@ -27,6 +30,33 @@ export function App() {
   }));
   const [ansicht, setAnsicht] = useState<Ansicht>({ seite: 'start' });
   const [rundgang, setRundgang] = useState(false);
+  const [spieler, setSpielerStand] = useState<SpielerStand>(spielerLaden);
+  const [spielerOffen, setSpielerOffen] = useState(false);
+  const [fuehrung, setFuehrungState] = useState<Fuehrung | null>(fuehrungLaden);
+  const ich = spieler.aktiv;
+  const bekannte = alleSpieler(spieler, aufnahmen);
+
+  function spielerSetzen(s: SpielerStand) { setSpielerStand(s); spielerSpeichern(s); }
+  function fuehrungSetzen(f: Fuehrung | null) { setFuehrungState(f); fuehrungSpeichern(f); }
+  function spielerUmbenennen(alt: string, neu: string) {
+    const r = umbenennen(alt, neu, aufnahmen, spieler);
+    alleSetzen(r.aufnahmen);
+    spielerSetzen(r.stand);
+    (Object.keys(matches) as SpielArt[]).forEach((art) => {
+      const m = matchUmbenennen(matches[art], alt, neu);
+      if (m !== matches[art]) setMatch(art, m);
+    });
+    try {
+      const n = JSON.parse(localStorage.getItem('dart-x01-namen') ?? 'null');
+      if (Array.isArray(n)) localStorage.setItem('dart-x01-namen', JSON.stringify([...new Set(n.map((x: string) => (x === alt ? neu : x)))]));
+    } catch { /* egal */ }
+    if (fuehrung?.spieler === alt) fuehrungSetzen({ ...fuehrung, spieler: neu });
+  }
+  /** Neue Spieler aus einem Spiel in die Liste übernehmen. */
+  function spielerMerken(namen: string[]) {
+    const neu = namen.filter((n) => n !== 'Computer' && !spieler.liste.includes(n));
+    if (neu.length) spielerSetzen({ ...spieler, liste: [...spieler.liste, ...neu] });
+  }
   const [reiter, setReiter] = useState<Reiter>(() => {
     try {
       const r = localStorage.getItem('dart-reiter');
@@ -92,11 +122,24 @@ export function App() {
     try { localStorage.setItem('dart-reiter', r); } catch { /* egal */ }
   }
   const gemeinsam = { aufnahmen, hinzufuegen, letzteEntfernen, onMenu: zumStart };
+  const spielerFenster = spielerOffen && (
+    <SpielerFenster
+      liste={bekannte}
+      aktiv={ich}
+      onWahl={(n) => { spielerSetzen({ ...spieler, aktiv: n }); setSpielerOffen(false); }}
+      onNeu={(n) => { spielerSetzen({ liste: [...spieler.liste, n], aktiv: n }); setSpielerOffen(false); }}
+      onUmbenennen={spielerUmbenennen}
+      onZu={() => setSpielerOffen(false)}
+    />
+  );
 
-  if (ansicht.seite === 'training') return <Training {...gemeinsam} />;
+  if (ansicht.seite === 'training') {
+    const f = fuehrung?.spieler === ich ? fuehrung : null;
+    return <Training {...gemeinsam} spieler={ich} fuehrung={f} onFuehrung={fuehrungSetzen} />;
+  }
   if (ansicht.seite === 'neu') {
     const art = ansicht.art;
-    return <SpielNeu key={art} art={art} onAbbruch={zumStart} onStart={(m) => { setMatch(art, m); setAnsicht({ seite: 'spiel', art }); }} />;
+    return <SpielNeu key={art} art={art} ich={ich} bekannte={bekannte} onAbbruch={zumStart} onStart={(m) => { spielerMerken(m.spieler); setMatch(art, m); setAnsicht({ seite: 'spiel', art }); }} />;
   }
   if (ansicht.seite === 'spiel') {
     const art = ansicht.art;
@@ -114,17 +157,18 @@ export function App() {
   return (
     <div className="hauptseite">
       {reiter === 'statistik' ? (
-        <Statistik aufnahmen={aufnahmen} onErsetzen={alleSetzen} />
+        <Statistik key={ich} aufnahmen={aufnahmen} ich={ich} onErsetzen={alleSetzen} />
       ) : reiter === 'tipps' ? (
         <Tipps onRundgang={() => setRundgang(true)} />
       ) : reiter === 'liga' ? (
         <Liga
           aufnahmen={aufnahmen}
+          ich={ich}
           onTraining={() => setAnsicht({ seite: 'training' })}
           onNeu={(art) => setAnsicht({ seite: 'neu', art })}
           onComputer={(avg, legs) => {
             if (matches.x01 && !confirm('Dein laufendes 501-Spiel wird dabei beendet. Weiter?')) return;
-            setMatch('x01', computerMatch(avg, legs));
+            setMatch('x01', computerMatch(avg, legs, ich));
             setAnsicht({ seite: 'spiel', art: 'x01' });
           }}
           laufend={matches.x01?.computer ? { avg: matches.x01.computer.avg, onWeiter: () => setAnsicht({ seite: 'spiel', art: 'x01' }) } : undefined}
@@ -133,6 +177,11 @@ export function App() {
         <Start
           reiter={reiter}
           matches={matches}
+          aufnahmen={aufnahmen}
+          ich={ich}
+          onSpieler={() => setSpielerOffen(true)}
+          fuehrung={fuehrung?.spieler === ich ? fuehrung : null}
+          onFuehrung={(f) => { fuehrungSetzen(f); setAnsicht({ seite: 'training' }); }}
           onTraining={() => setAnsicht({ seite: 'training' })}
           onNeu={(art) => setAnsicht({ seite: 'neu', art })}
           onWeiter={(art) => setAnsicht({ seite: 'spiel', art })}
@@ -141,6 +190,7 @@ export function App() {
       <Reiterleiste aktiv={reiter} onWahl={reiterWaehlen} />
       <StartHilfe />
       {rundgang && <Rundgang onFertig={() => setRundgang(false)} />}
+      {spielerFenster}
     </div>
   );
 }

@@ -11,6 +11,8 @@ import { neueId, type Aufnahme, type SpielArt } from './speicher';
 
 interface Props {
   aufnahmen: Aufnahme[];
+  /** Wessen Würfe zählen (aktiver Spieler). */
+  ich?: string;
   onTraining: () => void;
   onNeu: (art: SpielArt) => void;
   onComputer: (avg: number, legsZiel: number) => void;
@@ -31,7 +33,7 @@ function countdown(tage: number): string {
   return `noch ${tage} Tage`;
 }
 
-export function Liga({ aufnahmen, onTraining, onNeu, onComputer, laufend }: Props) {
+export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend }: Props) {
   const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden());
   const [bearbeiten, setBearbeiten] = useState<Spieltag | null>(null);
   const [verbinden, setVerbinden] = useState(false);
@@ -107,7 +109,7 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer, laufend }: Prop
   const naechster = naechsterSpieltag(daten.spieltage, jetzt);
   const letzter = letzterSpieltag(daten.spieltage, jetzt);
   const tage = naechster ? tageBis(naechster.datum, jetzt) : null;
-  const tr = trainingsAverage(aufnahmen, Date.now() - 30 * TAG);
+  const tr = trainingsAverage(aufnahmen, Date.now() - 30 * TAG, ich);
   const st = staerken(naechster, tr.avg);
   const legs = daten.legsZiel;
   const neuerSpieltag = () => setBearbeiten({ id: neueId(), datum: heuteText(new Date(Date.now() + 7 * TAG)), zeit: '19:00', gegner: '', heim: true, spiele: [] });
@@ -185,6 +187,7 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer, laufend }: Prop
         <Plan
           tage={tage}
           aufnahmen={aufnahmen}
+          ich={ich}
           letzter={letzter}
           daten={daten}
           trainingAvg={tr.avg}
@@ -288,6 +291,7 @@ function Aufgabe({ titel, text, knopf, onClick }: { titel: string; text?: ReactN
 function Plan(p: {
   tage: number | null;
   aufnahmen: Aufnahme[];
+  ich?: string;
   letzter: Spieltag | null;
   daten: LigaDaten;
   trainingAvg: number | null;
@@ -301,7 +305,7 @@ function Plan(p: {
   const seitLetztem = p.letzter ? new Date(p.letzter.datum).getTime() + TAG : Date.now() - 21 * TAG;
   const sims = p.daten.simulationen.filter((s) => s.zeit >= seitLetztem);
   const simSiege = sims.filter((s) => s.legsIch > s.legsComputer).length;
-  const dq = doppelQuote(p.aufnahmen, Date.now() - 30 * TAG);
+  const dq = doppelQuote(p.aufnahmen, Date.now() - 30 * TAG, p.ich);
   const notizen = p.letzter
     ? [p.letzter.notiz, ...p.letzter.spiele.map((s) => s.notiz)].filter((x): x is string => !!x?.trim())
     : [];

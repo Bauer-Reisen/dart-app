@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
-import type { Match, SpielArt } from './speicher';
+import { zielLabel } from './board';
+import { RUNDE, trainingsVorschlag, type Fuehrung } from './fuehrung';
+import { SpielerLeiste } from './SpielerWahl';
+import { dartsVon, type Aufnahme, type Match, type SpielArt } from './speicher';
 
 export type Reiter = 'training' | 'spiele' | 'liga' | 'statistik' | 'tipps';
 
@@ -9,6 +12,11 @@ interface Props {
   onTraining: () => void;
   onNeu: (art: SpielArt) => void;
   onWeiter: (art: SpielArt) => void;
+  aufnahmen: Aufnahme[];
+  ich: string;
+  onSpieler: () => void;
+  fuehrung: Fuehrung | null;
+  onFuehrung: (f: Fuehrung) => void;
 }
 
 const NAME: Record<SpielArt, (m: Match) => string> = {
@@ -34,11 +42,32 @@ function Kachel({ titel, text, onClick }: { titel: string; text: string; onClick
   );
 }
 
-export function Start({ reiter, matches, onTraining, onNeu, onWeiter }: Props) {
+export function Start({ reiter, matches, onTraining, onNeu, onWeiter, aufnahmen, ich, onSpieler, fuehrung, onFuehrung }: Props) {
   const laufend = GRUPPE[reiter].filter((a) => matches[a]);
+  const v = reiter === 'training' ? trainingsVorschlag(dartsVon(aufnahmen.filter((a) => !a.bot), ich)) : null;
   return (
     <div className="seite start">
       <h1>{reiter === 'training' ? 'Training' : 'Spiele'}</h1>
+      <SpielerLeiste aktiv={ich} onOeffnen={onSpieler} />
+
+      {reiter === 'training' && fuehrung && (
+        <button className="kachel weiter" onClick={onTraining}>
+          <b>▶ Geführtes Training fortsetzen</b>
+          <span>{zielLabel(fuehrung.ziel)} · {fuehrung.fokus}</span>
+        </button>
+      )}
+      {v && !fuehrung && (
+        <div className="trainings-vorschlag">
+          <h3>🎯 Dein Trainingsvorschlag</h3>
+          <p><b>{v.titel}</b></p>
+          <p className="info klein">{v.grund}</p>
+          <p className="fokus">Achte auf: {v.fokus}</p>
+          <button className="btn gross an" style={{ width: '100%', marginTop: 8 }}
+            onClick={() => onFuehrung({ ziel: v.ziel, richtung: v.richtung, fokus: v.fokus, seit: Date.now(), spieler: ich })}>
+            Los: {RUNDE} Aufnahmen
+          </button>
+        </div>
+      )}
 
       {laufend.map((art) => {
         const m = matches[art]!;

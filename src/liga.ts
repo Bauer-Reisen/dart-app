@@ -185,11 +185,11 @@ export function gegnerNamen(liste: Spieltag[]): string[] {
 }
 
 /** Eigener 501-Average im Training (ohne Computer-Würfe) seit einem Zeitpunkt. */
-export function trainingsAverage(aufnahmen: Aufnahme[], seit: number): { avg: number | null; darts: number } {
+export function trainingsAverage(aufnahmen: Aufnahme[], seit: number, ich = ICH): { avg: number | null; darts: number } {
   let punkte = 0;
   let darts = 0;
   for (const a of aufnahmen) {
-    if (a.modus !== 'x01' || a.bot || (a.spieler ?? ICH) !== ICH || a.start < seit) continue;
+    if (a.modus !== 'x01' || a.bot || (a.spieler ?? ICH) !== ich || a.start < seit) continue;
     const e = auswerten(a.restVorher ?? 501, a.darts.map((d) => d.hit), a.doubleOut ?? true);
     punkte += e.punkte;
     darts += a.darts.length;
@@ -198,11 +198,11 @@ export function trainingsAverage(aufnahmen: Aufnahme[], seit: number): { avg: nu
 }
 
 /** Doppelquote (Darts aufs Doppel, die das Doppel trafen) seit einem Zeitpunkt. */
-export function doppelQuote(aufnahmen: Aufnahme[], seit: number): { quote: number | null; n: number } {
+export function doppelQuote(aufnahmen: Aufnahme[], seit: number, ich = ICH): { quote: number | null; n: number } {
   let n = 0;
   let t = 0;
   for (const a of aufnahmen) {
-    if (a.bot || (a.spieler ?? ICH) !== ICH || a.start < seit) continue;
+    if (a.bot || (a.spieler ?? ICH) !== ich || a.start < seit) continue;
     for (const d of a.darts) {
       if (d.frei || d.ziel.ring !== 'D') continue;
       n++;

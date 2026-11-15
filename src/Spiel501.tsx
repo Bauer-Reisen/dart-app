@@ -38,13 +38,14 @@ const TITEL: Record<SpielArt, string> = {
 const OPTION_START: Partial<Record<SpielArt, string>> = { atc: 'jedes', doppel: 'finish' };
 const DOPPEL_WAHL = ['D20', 'D16', 'D8', 'D10', 'D18', 'D12', 'D4', 'D2', 'Bull'];
 
-export function SpielNeu({ art, onStart, onAbbruch }: { art: SpielArt; onStart: (m: X01Match) => void; onAbbruch: () => void }) {
+export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: { art: SpielArt; onStart: (m: X01Match) => void; onAbbruch: () => void; ich?: string; bekannte?: string[] }) {
+  // Wer gerade wirft, steht vorne; die übrigen Namen vom letzten Spiel bleiben
   const [namen, setNamen] = useState<string[]>(() => {
     try {
       const n = JSON.parse(localStorage.getItem(KEY_NAMEN) ?? 'null');
-      if (Array.isArray(n) && n.length) return n;
+      if (Array.isArray(n) && n.length) return [ich, ...n.filter((x: string) => x !== ich)].slice(0, n.length);
     } catch { /* egal */ }
-    return [ICH];
+    return [ich];
   });
   const [start, setStart] = useState(501);
   const [doubleOut, setDoubleOut] = useState(true);
@@ -225,6 +226,13 @@ export function SpielNeu({ art, onStart, onAbbruch }: { art: SpielArt; onStart: 
       ))}
       {namen.length < maxSpieler && (
         <button className="btn" onClick={() => setNamen([...namen, ''])}>＋ Spieler</button>
+      )}
+      {namen.length < maxSpieler && bekannte.some((b) => !namen.includes(b)) && (
+        <div className="schnell-spieler">
+          {bekannte.filter((b) => !namen.includes(b)).map((b) => (
+            <button key={b} className="btn" onClick={() => setNamen([...namen.filter((x) => x.trim()), b])}>＋ {b}</button>
+          ))}
+        </div>
       )}
 
       <button className="btn gross los" onClick={los}>Spiel starten</button>

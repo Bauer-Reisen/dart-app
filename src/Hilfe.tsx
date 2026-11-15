@@ -17,6 +17,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.5.0', titel: 'Mehrere Spieler und geführtes Training',
+    punkte: [
+      <>Oben bei Training und Spiele: <b>Es wirft: …</b> – tippe drauf, um zu wählen, wer wirft, oder neue Spieler anzulegen. Jeder hat seine eigene Statistik. Mit ✎ machst du aus „Ich“ deinen Namen, die bisherigen Würfe gehen mit.</>,
+      <>Im Reiter Training steht ein <b>Trainingsvorschlag</b> aus deinem Trefferbild: welches Ziel, worauf du achten sollst – und nach 10 Aufnahmen der Vergleich mit vorher.</>,
+    ],
+  },
+  {
     v: '0.4.0', titel: '1., 2. und 3. Dart',
     punkte: [
       <>Die Felder oben sind jetzt nummeriert. Tippe die Darts <b>in der Reihenfolge</b> ein, wie du geworfen hast.</>,
@@ -52,7 +59,11 @@ const KARTEN: { icon: string; titel: string; text: ReactNode }[] = [
   },
   {
     icon: '🏋️', titel: 'Training',
-    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wohin du danebenwirfst. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
+    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wohin du danebenwirfst. Sobald sie dein Wurfbild kennt, macht sie oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
+  },
+  {
+    icon: '👥', titel: 'Wer wirft?',
+    text: <>Oben bei Training und Spiele steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik.</>,
   },
   {
     icon: '🎮', titel: 'Spiele',
@@ -135,13 +146,13 @@ export function einmalMerken(name: string) {
 }
 
 /** Kurze Erklärung in einem Fenster mit „Alles klar". */
-export function Erklaerung({ titel, children, onZu }: { titel: string; children: ReactNode; onZu: () => void }) {
+export function Erklaerung({ titel, children, onZu, knopf = 'Alles klar' }: { titel: string; children: ReactNode; onZu: () => void; knopf?: string }) {
   return (
     <div className="wahl mitte" onClick={onZu}>
       <div className="wahl-box hilfe-box tipp-box" onClick={(e) => e.stopPropagation()}>
         <h3>{titel}</h3>
         {children}
-        <button className="btn an gross" style={{ width: '100%', marginTop: 10 }} onClick={onZu}>Alles klar</button>
+        <button className="btn an gross" style={{ width: '100%', marginTop: 10 }} onClick={onZu}>{knopf}</button>
       </div>
     </div>
   );

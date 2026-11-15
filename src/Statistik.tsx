@@ -12,6 +12,8 @@ import { auswerten, average, istDoppel } from './x01';
 interface Props {
   aufnahmen: Aufnahme[];
   onErsetzen: (a: Aufnahme[]) => void;
+  /** Aktiver Spieler: wird zuerst gezeigt. */
+  ich?: string;
 }
 
 type Zaehler = Record<Klasse, number> & { wuerfe: number; ziel: Ziel };
@@ -168,11 +170,11 @@ function uebungsWerte(meine: Aufnahme[]) {
   return { doppel, atc, bobs };
 }
 
-export function Statistik({ aufnahmen: alle, onErsetzen }: Props) {
+export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
   const aufnahmen = alle.filter((a) => !a.bot); // Würfe des Computer-Gegners zählen nicht
   const datei = useRef<HTMLInputElement>(null);
-  const spielerListe = [...new Set([ICH, ...aufnahmen.map(wer)])];
-  const [spieler, setSpieler] = useState(ICH);
+  const spielerListe = [...new Set([ich, ...aufnahmen.map(wer)])];
+  const [spieler, setSpieler] = useState(ich);
   const meine = aufnahmen.filter((a) => wer(a) === spieler);
 
   const proZiel = new Map<string, Zaehler>();
