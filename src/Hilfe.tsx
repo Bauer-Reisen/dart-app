@@ -17,6 +17,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.9.0', titel: 'Allein oder in der Gruppe',
+    punkte: [
+      <>In der <b>Statistik</b> wählst du oben <b>Alle · Allein · In der Gruppe</b>. So siehst du, wie du im Training wirfst und wie in Spielen mit anderen.</>,
+      <>Allein = Training und Spiele allein oder gegen den Computer. Gruppe = Spiele mit mindestens einem anderen Spieler. Gilt auch für alle bisherigen Würfe.</>,
+    ],
+  },
+  {
     v: '0.8.7', titel: 'Scheibe mit zwei Fingern zoomen',
     punkte: [
       <>Zieh die Scheibe mit <b>zwei Fingern auf und zu</b> und verschieb sie – wie bei Fotos. Ganz zuziehen zeigt wieder die ganze Scheibe.</>,

@@ -25,6 +25,7 @@ export interface Aufnahme {
   bust?: boolean;
   check?: boolean;
   bot?: boolean; // Wurf des Computer-Gegners: zählt nicht in die Statistik
+  gruppe?: boolean; // in der Gruppe geworfen (für übernommene Würfe, deren Mitspieler fehlen)
 }
 
 export const ICH = 'Ich';

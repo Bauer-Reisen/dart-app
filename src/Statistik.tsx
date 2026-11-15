@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { gruppenLegs, nachBereich, type Bereich } from './gruppe';
 import { points, zielLabel, type Ziel } from './board';
 import { RUNDEN, rundenName } from './halveit';
 import { wurfbild, wurfbildTipps } from './tipps';
@@ -178,7 +179,13 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
   const aufnahmen = alle.filter((a) => !a.bot); // Würfe des Computer-Gegners zählen nicht
   const datei = useRef<HTMLInputElement>(null);
   const spieler = ich;
-  const meine = aufnahmen.filter((a) => wer(a) === spieler);
+  const alleMeine = aufnahmen.filter((a) => wer(a) === spieler);
+  // Allein / in der Gruppe: Auswahl nur zeigen, wenn es beides gibt
+  const legs = gruppenLegs(aufnahmen);
+  const [bereich, setBereich] = useState<Bereich>('alle');
+  const nGruppe = nachBereich(alleMeine, 'gruppe', legs).length;
+  const beides = nGruppe > 0 && nGruppe < alleMeine.length;
+  const meine = beides ? nachBereich(alleMeine, bereich, legs) : alleMeine;
 
   const proZiel = new Map<string, Zaehler>();
   for (const a of meine) {
@@ -242,6 +249,17 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
       <h1>Statistik</h1>
 
       {onSpieler && <SpielerLeiste aktiv={ich} onOeffnen={onSpieler} />}
+
+      {beides && (
+        <div className="ringwahl bereich-wahl">
+          {([['alle', 'Alle'], ['allein', 'Allein'], ['gruppe', 'In der Gruppe']] as const).map(([k, t]) => (
+            <button key={k} className={'btn' + (bereich === k ? ' an' : '')} onClick={() => setBereich(k)}>{t}</button>
+          ))}
+        </div>
+      )}
+      {beides && bereich !== 'alle' && (
+        <p className="info klein">{bereich === 'allein' ? 'Training und Spiele allein oder gegen den Computer.' : 'Spiele mit mindestens einem anderen Spieler.'}</p>
+      )}
 
       <p className="info">
         {meine.length} Aufnahmen
