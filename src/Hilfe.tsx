@@ -17,6 +17,12 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.8.1', titel: 'Reihenfolge ändern',
+    punkte: [
+      <>Vor dem Spiel kannst du die Spieler mit <b>↑ ↓</b> umsortieren – z. B. nach dem Ausbullen: Wer gewinnt, kommt nach oben und fängt an.</>,
+    ],
+  },
+  {
     v: '0.8.0', titel: 'Ansage bei 501',
     punkte: [
       <>Bei <b>501/301</b> kannst du eine <b>Ansage</b> einschalten (Deutsch oder Englisch): Nach jeder Aufnahme sagt die App die Punkte – und im Finish-Bereich z. B. „Alex, you require 32“.</>,

@@ -74,6 +74,12 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
     try { return localStorage.getItem(`dart-${art}-option`) ?? OPTION_START[art]; } catch { return OPTION_START[art]; }
   });
 
+  function tauschen(a: number, b: number) {
+    const n = [...namen];
+    [n[a], n[b]] = [n[b], n[a]];
+    setNamen(n);
+  }
+
   function los() {
     const spieler = namen.slice(0, maxSpieler).map((n, i) => n.trim() || `Spieler ${i + 1}`);
     try { localStorage.setItem(KEY_NAMEN, JSON.stringify(spieler)); } catch { /* egal */ }
@@ -228,6 +234,7 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
       </div>
 
       <h3>Spieler (Reihenfolge = wer anfängt)</h3>
+      {namen.length > 1 && <p className="info klein">Mit ↑ ↓ die Reihenfolge ändern, z. B. nach dem Ausbullen: wer gewinnt, nach oben.</p>}
       {namen.slice(0, maxSpieler).map((n, i) => (
         <div className="spielerzeile" key={i}>
           <input
@@ -236,9 +243,11 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
             placeholder={`Spieler ${i + 1}`}
             onChange={(ev) => setNamen(namen.map((x, j) => (j === i ? ev.target.value : x)))}
           />
-          {namen.length > 1 && (
+          {namen.length > 1 && <>
+            <button className="btn pfeil" disabled={i === 0} onClick={() => tauschen(i, i - 1)} aria-label="nach oben">↑</button>
+            <button className="btn pfeil" disabled={i >= Math.min(namen.length, maxSpieler) - 1} onClick={() => tauschen(i, i + 1)} aria-label="nach unten">↓</button>
             <button className="btn" onClick={() => setNamen(namen.filter((_, j) => j !== i))} aria-label="Spieler entfernen">✕</button>
-          )}
+          </>}
         </div>
       ))}
       {namen.length < maxSpieler && (

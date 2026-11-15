@@ -476,3 +476,5 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .trefferbild-box p { margin: 0; }
 .legende { font-size: 12px; color: var(--leise); margin-top: 4px; }
 .legende .g { color: #4cc26b; } .legende .r { color: #e0533f; }
+.spielerzeile .btn.pfeil { flex: none; min-width: 44px; padding: 0 10px; }
+.spielerzeile .btn.pfeil:disabled { opacity: .3; }
