@@ -71,8 +71,43 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
       : <>{letzte.spieler}: <b>{letzte.wert ?? 0}</b> {letzte.wert === 1 ? 'Strich' : 'Striche'}</>;
   }
 
-  const oben = (
-    <table className="ctafel">
+  const am = (i: number) => i === s && jetzt.gewinner === null;
+  // Quer: Namen oben, Zahlen untereinander (schmale Spalte rechts). Hochkant: Spieler als Zeilen.
+  const gedreht = (
+    <table className="ctafel gedreht">
+      <thead>
+        <tr>
+          <th />
+          {match.spieler.map((name, i) => (
+            <th key={i} className={'cname' + (am(i) ? ' amzug' : '')}>
+              {name}{match.legs.length > 1 || siege[i] ? <span className="legs"> · {siege[i]}</span> : null}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {NUMMERN.map((z, j) => (
+          <tr key={z}>
+            <th className={'cnr' + (offenAlle[j] ? '' : ' zu')}>{z === 25 ? 'B' : z}</th>
+            {match.spieler.map((_, i) => (
+              <td key={i} className={'cmark m' + jetzt.marks[i][j] + (offenAlle[j] ? '' : ' zu') + (am(i) ? ' amzug' : '')}>{zeichen(jetzt.marks[i][j])}</td>
+            ))}
+          </tr>
+        ))}
+        {n > 1 && (
+          <tr>
+            <th className="cnr">{variante === 'vergeben' ? 'Minus' : 'Pkt'}</th>
+            {match.spieler.map((_, i) => (
+              <td key={i} className={'cpkt' + (am(i) ? ' amzug' : '')}>{jetzt.punkte[i]}</td>
+            ))}
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+
+  const oben = <>{gedreht}
+    <table className="ctafel normal">
       <thead>
         <tr>
           <th />
@@ -94,7 +129,7 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
         ))}
       </tbody>
     </table>
-  );
+  </>;
 
   const g = stand.gewinner;
   const mprG = g !== null ? mpr(stand.nutz[g], stand.darts[g]) : null;

@@ -478,3 +478,20 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .legende .g { color: #4cc26b; } .legende .r { color: #e0533f; }
 .spielerzeile .btn.pfeil { flex: none; min-width: 44px; padding: 0 10px; }
 .spielerzeile .btn.pfeil:disabled { opacity: .3; }
+
+/* Cricket-Tafel gedreht (nur Tablet quer): Namen oben, Zahlen untereinander */
+.ctafel.gedreht { display: none; }
+.ctafel.gedreht th:first-child { width: 20%; }
+.ctafel.gedreht th.cname { text-align: center !important; padding: 0 4px 2px !important; }
+.ctafel.gedreht th.cname.amzug { color: var(--akzent); }
+.ctafel.gedreht th.cnr { font-size: 15px; text-align: center; }
+.ctafel.gedreht th.cnr.zu { text-decoration: line-through; opacity: .45; }
+.ctafel.gedreht td.amzug { background: #2e2a14; }
+/* nur Tablet quer – am Handy quer ist die Tafel sonst zu hoch */
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
+  .ctafel.normal { display: none; }
+  .ctafel.gedreht { display: table; }
+  .ctafel.gedreht td { height: 38px; font-size: 26px; }
+  .ctafel.gedreht th.cnr { font-size: 18px; }
+  .ctafel.gedreht .cpkt { font-size: 20px !important; }
+}
