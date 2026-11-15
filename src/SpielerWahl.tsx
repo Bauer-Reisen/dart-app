@@ -1,5 +1,5 @@
 // „Wer wirft?" – Leiste oben im Training und bei den Spielen, Fenster zum Wählen, Anlegen und Umbenennen.
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { nameOk } from './spieler';
 
 export function SpielerLeiste({ aktiv, onOeffnen }: { aktiv: string; onOeffnen: () => void }) {
@@ -33,7 +33,11 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
     setNeu('');
   }
 
+  const fertig = useRef<string | null>(null); // verhindert doppeltes Speichern (Verlassen des Feldes + OK)
   function speichern(alt: string) {
+    if (fertig.current === alt) return;
+    fertig.current = alt;
+    setTimeout(() => { fertig.current = null; }, 500);
     const n = nameOk(text);
     setBearbeite(null);
     if (!n || n === alt) return;
@@ -41,8 +45,11 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
     onUmbenennen(alt, n);
   }
 
+  // Schließen speichert einen gerade bearbeiteten Namen mit (sonst ginge die Änderung verloren)
+  const zu = () => { if (bearbeite) speichern(bearbeite); onZu(); };
+
   return (
-    <div className="wahl mitte" onClick={onZu}>
+    <div className="wahl mitte" onClick={zu}>
       <div className="wahl-box hilfe-box tipp-box" onClick={(e) => e.stopPropagation()}>
         <h3>Wer wirft?</h3>
         <p className="info klein">Jeder Spieler hat seine eigene Statistik und seine eigenen Tipps.</p>
@@ -52,7 +59,7 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
               {bearbeite === n ? (
                 <>
                   <input autoFocus value={text} maxLength={16} onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') speichern(n); }} aria-label="Neuer Name" />
+                    onKeyDown={(e) => { if (e.key === 'Enter') speichern(n); }} onBlur={() => speichern(n)} aria-label="Neuer Name" />
                   <button className="btn an" onClick={() => speichern(n)}>OK</button>
                 </>
               ) : (
@@ -70,7 +77,7 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
           <button className="btn" onClick={anlegen} disabled={!nameOk(neu)}>＋</button>
         </div>
         <p className="info klein">Mit ✎ änderst du einen Namen – alle bisherigen Würfe gehen mit. Aus „Ich" wird so zum Beispiel dein Name.</p>
-        <button className="btn gross" style={{ width: '100%', marginTop: 10 }} onClick={onZu}>Schließen</button>
+        <button className="btn gross" style={{ width: '100%', marginTop: 10 }} onClick={zu}>Schließen</button>
       </div>
     </div>
   );

@@ -8,7 +8,8 @@ import { dartfolge, MIN_N, quoteText } from './dartfolge';
 import { treffpunkt, treffpunktText } from './treffpunkt';
 import { TrefferBild } from './TrefferBild';
 import { alsDateiSichern, ausDateiLaden, ICH, type Aufnahme } from './speicher';
-import { ligaLaden, ligaSpeichern, type LigaDaten } from './liga';
+import { ligaAlle, ligaAlleSetzen, type LigaDaten } from './liga';
+import { SpielerLeiste } from './SpielerWahl';
 import { auswerten, average, istDoppel } from './x01';
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
   onErsetzen: (a: Aufnahme[]) => void;
   /** Aktiver Spieler: wird zuerst gezeigt. */
   ich?: string;
+  onSpieler?: () => void;
 }
 
 type Zaehler = Record<Klasse, number> & { wuerfe: number; ziel: Ziel };
@@ -172,11 +174,10 @@ function uebungsWerte(meine: Aufnahme[]) {
   return { doppel, atc, bobs };
 }
 
-export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
+export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }: Props) {
   const aufnahmen = alle.filter((a) => !a.bot); // Würfe des Computer-Gegners zählen nicht
   const datei = useRef<HTMLInputElement>(null);
-  const spielerListe = [...new Set([ich, ...aufnahmen.map(wer)])];
-  const [spieler, setSpieler] = useState(ich);
+  const spieler = ich;
   const meine = aufnahmen.filter((a) => wer(a) === spieler);
 
   const proZiel = new Map<string, Zaehler>();
@@ -226,7 +227,10 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
       const { aufnahmen: a, liga } = await ausDateiLaden(f);
       if (confirm(`${a.length} Aufnahmen laden? Die jetzigen Daten werden ersetzt.`)) {
         onErsetzen(a);
-        if (liga) ligaSpeichern(liga as LigaDaten);
+        // alte Sicherungen: ein Liga-Stand (gehört dem aktiven Spieler); neue: je Spieler
+        if (liga && typeof liga === 'object') {
+          ligaAlleSetzen(Array.isArray((liga as LigaDaten).spieltage) ? { [ich]: liga as LigaDaten } : (liga as Record<string, LigaDaten>));
+        }
       }
     } catch {
       alert('Diese Datei kann ich nicht lesen.');
@@ -237,13 +241,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
     <div className="seite stats">
       <h1>Statistik</h1>
 
-      {spielerListe.length > 1 && (
-        <div className="ringwahl spielerwahl">
-          {spielerListe.map((n) => (
-            <button key={n} className={'btn' + (n === spieler ? ' an' : '')} onClick={() => setSpieler(n)}>{n}</button>
-          ))}
-        </div>
-      )}
+      {onSpieler && <SpielerLeiste aktiv={ich} onOeffnen={onSpieler} />}
 
       <p className="info">
         {meine.length} Aufnahmen
@@ -375,7 +373,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
       })}
 
       <div className="stats-knoepfe">
-        <button className="btn" onClick={() => alsDateiSichern(alle, ligaLaden())} disabled={!alle.length}>Als Datei sichern</button>
+        <button className="btn" onClick={() => alsDateiSichern(alle, ligaAlle())} disabled={!alle.length}>Als Datei sichern</button>
         <button className="btn" onClick={() => datei.current?.click()}>Datei laden</button>
         <button
           className="btn warn"

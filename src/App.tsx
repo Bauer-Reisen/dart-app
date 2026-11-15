@@ -13,6 +13,7 @@ import { laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match
 import { alleSpieler, matchUmbenennen, spielerLaden, spielerSpeichern, umbenennen, type SpielerStand } from './spieler';
 import { SpielerFenster } from './SpielerWahl';
 import { fuehrungLaden, fuehrungSpeichern, type Fuehrung } from './fuehrung';
+import { ligaUmbenennen } from './liga';
 
 type Ansicht =
   | { seite: 'start' | 'training' }
@@ -42,6 +43,7 @@ export function App() {
     const r = umbenennen(alt, neu, aufnahmen, spieler);
     alleSetzen(r.aufnahmen);
     spielerSetzen(r.stand);
+    ligaUmbenennen(alt, neu);
     (Object.keys(matches) as SpielArt[]).forEach((art) => {
       const m = matchUmbenennen(matches[art], alt, neu);
       if (m !== matches[art]) setMatch(art, m);
@@ -157,13 +159,15 @@ export function App() {
   return (
     <div className="hauptseite">
       {reiter === 'statistik' ? (
-        <Statistik key={ich} aufnahmen={aufnahmen} ich={ich} onErsetzen={alleSetzen} />
+        <Statistik key={ich} aufnahmen={aufnahmen} ich={ich} onErsetzen={alleSetzen} onSpieler={() => setSpielerOffen(true)} />
       ) : reiter === 'tipps' ? (
         <Tipps onRundgang={() => setRundgang(true)} />
       ) : reiter === 'liga' ? (
         <Liga
+          key={ich}
           aufnahmen={aufnahmen}
           ich={ich}
+          onSpieler={() => setSpielerOffen(true)}
           onTraining={() => setAnsicht({ seite: 'training' })}
           onNeu={(art) => setAnsicht({ seite: 'neu', art })}
           onComputer={(avg, legs) => {

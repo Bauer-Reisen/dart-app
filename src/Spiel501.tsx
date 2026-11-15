@@ -370,7 +370,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
   }
   function merken() {
     if (!bot || matchSieger < 0) return;
-    simulationMerken({ zeit: Date.now(), gegnerAvg: bot.avg, legsIch: legsGewonnen[ich], legsComputer: legsGewonnen[bot.platz], average: matchAvg(ich) });
+    simulationMerken({ zeit: Date.now(), gegnerAvg: bot.avg, legsIch: legsGewonnen[ich], legsComputer: legsGewonnen[bot.platz], average: matchAvg(ich) }, match.spieler[ich]);
   }
 
   const g = stand.gewinner;

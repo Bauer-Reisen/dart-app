@@ -55,34 +55,72 @@ export interface NuLigaVerbindung {
   stand?: number; // letzte Aktualisierung (ms)
 }
 
-const KEY = 'dart-liga';
+// Liga-Daten je Spieler (mehrere Ligaspieler auf einem Gerät). Speicher: dart-liga-spieler = { Name: LigaDaten }.
+// Alte Daten (vor 0.7, ein gemeinsamer Stand unter dart-liga) gehören dem ersten Spieler der Liste – das war „Ich“.
+const KEY_ALT = 'dart-liga';
+const KEY = 'dart-liga-spieler';
 export const LEER: LigaDaten = { legsZiel: 3, spieltage: [], simulationen: [] };
 
-export function ligaLaden(): LigaDaten {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return LEER;
-    const d = JSON.parse(raw) as Partial<LigaDaten>;
-    return {
-      legsZiel: d.legsZiel ?? 3,
-      link: d.link,
-      spieltage: Array.isArray(d.spieltage) ? d.spieltage : [],
-      simulationen: Array.isArray(d.simulationen) ? d.simulationen : [],
-      nuliga: d.nuliga,
-    };
-  } catch {
-    return LEER;
-  }
+function pruefen(d: Partial<LigaDaten> | null | undefined): LigaDaten {
+  if (!d) return LEER;
+  return {
+    legsZiel: d.legsZiel ?? 3,
+    link: d.link,
+    spieltage: Array.isArray(d.spieltage) ? d.spieltage : [],
+    simulationen: Array.isArray(d.simulationen) ? d.simulationen : [],
+    nuliga: d.nuliga,
+  };
 }
 
-export function ligaSpeichern(d: LigaDaten): void {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch { /* egal */ }
+function ersterSpieler(): string {
+  try {
+    const s = JSON.parse(localStorage.getItem('dart-spieler') ?? 'null');
+    if (s && Array.isArray(s.liste) && s.liste[0]) return s.liste[0];
+  } catch { /* egal */ }
+  return ICH;
+}
+
+/** Alle Liga-Stände (für Sichern/Laden und Umbenennen). */
+export function ligaAlle(): Record<string, LigaDaten> {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return JSON.parse(raw) as Record<string, LigaDaten>;
+    const alt = localStorage.getItem(KEY_ALT);
+    if (alt) {
+      const m = { [ersterSpieler()]: pruefen(JSON.parse(alt)) };
+      localStorage.setItem(KEY, JSON.stringify(m));
+      localStorage.removeItem(KEY_ALT);
+      return m;
+    }
+  } catch { /* egal */ }
+  return {};
+}
+
+export function ligaAlleSetzen(m: Record<string, LigaDaten>): void {
+  try { localStorage.setItem(KEY, JSON.stringify(m)); } catch { /* egal */ }
+}
+
+export function ligaLaden(spieler = ICH): LigaDaten {
+  return pruefen(ligaAlle()[spieler]);
+}
+
+export function ligaSpeichern(d: LigaDaten, spieler = ICH): void {
+  ligaAlleSetzen({ ...ligaAlle(), [spieler]: d });
+}
+
+/** Beim Umbenennen eines Spielers mitnehmen (hat der neue Name schon Liga-Daten, bleiben diese). */
+export function ligaUmbenennen(alt: string, neu: string): void {
+  const m = ligaAlle();
+  if (!m[alt]) return;
+  if (!m[neu] || (!m[neu].spieltage.length && !m[neu].nuliga)) m[neu] = m[alt];
+  delete m[alt];
+  ligaAlleSetzen(m);
 }
 
 /** Ergebnis eines Übungs-Matches gegen den Computer festhalten. */
-export function simulationMerken(s: Omit<Simulation, 'id'>): void {
-  const d = ligaLaden();
-  ligaSpeichern({ ...d, simulationen: [...d.simulationen, { ...s, id: neueId() }] });
+export function simulationMerken(s: Omit<Simulation, 'id'>, spieler = ICH): void {
+  const d = ligaLaden(spieler);
+  ligaSpeichern({ ...d, simulationen: [...d.simulationen, { ...s, id: neueId() }] }, spieler);
 }
 
 // ---------------- Datum ----------------

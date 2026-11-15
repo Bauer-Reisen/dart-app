@@ -17,6 +17,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.7.0', titel: 'Spieler wechseln – überall',
+    punkte: [
+      <>Auch in <b>Statistik</b> und <b>Liga</b> steht oben <b>Es wirft: …</b> – so schaust du schnell die Statistik von jemand anderem an.</>,
+      <>Die <b>Liga</b> gehört jetzt zum Spieler: Mehrere Ligaspieler auf einem Gerät haben jeweils ihre eigene Liga, ihre Spieltage und ihren Plan.</>,
+    ],
+  },
+  {
     v: '0.6.0', titel: 'Genau tippen lohnt sich',
     punkte: [
       <>Die App merkt sich jetzt, <b>wo genau</b> du ins Feld tippst. Tippe den Dart möglichst an die Stelle, wo er steckt.</>,
@@ -71,7 +78,7 @@ const KARTEN: { icon: string; titel: string; text: ReactNode }[] = [
   },
   {
     icon: '👥', titel: 'Wer wirft?',
-    text: <>Oben bei Training und Spiele steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik.</>,
+    text: <>Oben in Training, Spiele, Liga und Statistik steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik und seine eigene Liga.</>,
   },
   {
     icon: '🎮', titel: 'Spiele',

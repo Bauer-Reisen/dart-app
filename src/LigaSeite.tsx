@@ -1,3 +1,5 @@
+import { SpielerLeiste } from './SpielerWahl';
+import { ICH } from './speicher';
 // Liga-Reiter: nächster Spieltag, Vorbereitungsplan, Computer-Gegner, Ergebnisse, Gegner.
 import { useEffect, useState, type ReactNode } from 'react';
 import { ligaLink, nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort } from './nuligaImport';
@@ -13,6 +15,8 @@ interface Props {
   aufnahmen: Aufnahme[];
   /** Wessen Würfe zählen (aktiver Spieler). */
   ich?: string;
+  /** Spieler wechseln (Leiste oben). */
+  onSpieler?: () => void;
   onTraining: () => void;
   onNeu: (art: SpielArt) => void;
   onComputer: (avg: number, legsZiel: number) => void;
@@ -33,8 +37,8 @@ function countdown(tage: number): string {
   return `noch ${tage} Tage`;
 }
 
-export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend }: Props) {
-  const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden());
+export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, onSpieler }: Props) {
+  const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden(ich));
   const [bearbeiten, setBearbeiten] = useState<Spieltag | null>(null);
   const [verbinden, setVerbinden] = useState(false);
   const [laedt, setLaedt] = useState(false);
@@ -42,7 +46,7 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend }:
 
   function setzen(d: LigaDaten) {
     setDaten(d);
-    ligaSpeichern(d);
+    ligaSpeichern(d, ich);
   }
 
   /** Neueste Daten von nuLiga holen und übernehmen. */
@@ -53,7 +57,7 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend }:
     setMeldung(null);
     try {
       const a = await nuLigaHolen<NuLigaAntwort>('daten', { region: v.region, staffel: v.staffel, team: v.team, person: v.person });
-      const d = nuLigaUebernehmen({ ...ligaLaden(), nuliga: v }, a); // frisch laden, falls inzwischen etwas eingetragen wurde
+      const d = nuLigaUebernehmen({ ...ligaLaden(ich), nuliga: v }, a); // frisch laden, falls inzwischen etwas eingetragen wurde
       setzen(d);
     } catch (e) {
       setMeldung(navigator.onLine ? `Liga-Daten gerade nicht erreichbar (${(e as Error).message}).` : 'Kein Internet – Liga-Daten werden beim nächsten Mal geholt.');
@@ -128,6 +132,7 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend }:
   return (
     <div className="seite liga">
       <h1>Liga</h1>
+      {onSpieler && <SpielerLeiste aktiv={ich ?? ICH} onOeffnen={onSpieler} />}
 
       {daten.nuliga && (
         <div className="nuliga-zeile">
