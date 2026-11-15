@@ -15,6 +15,29 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Notfall: Bleibt die Seite leer (z. B. alte gespeicherte Fassung), nach 6 s einen Knopf zeigen,
+         der den Offline-Speicher der App-Dateien leert und neu lädt. Würfe und Spiele bleiben erhalten. -->
+    <div id="notfall" style="display:none;padding:32px 20px;font:17px/1.4 system-ui,sans-serif;color:#f2f2f2;background:#111;min-height:100vh;box-sizing:border-box">
+      <p style="margin:0 0 16px"><b>Die App lädt gerade nicht richtig.</b></p>
+      <p style="margin:0 0 20px">Tippe auf den Knopf – die App lädt dann frisch vom Server. Deine Würfe und Spiele bleiben erhalten.</p>
+      <button id="notfall-knopf" style="font:inherit;font-weight:700;padding:14px 20px;border:0;border-radius:12px;background:#ffd23f;color:#111">App neu laden</button>
+    </div>
+    <script>
+      (function () {
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (root && root.children.length) return;
+          document.getElementById('notfall').style.display = 'block';
+        }, 6000);
+        document.getElementById('notfall-knopf').onclick = function () {
+          var fertig = function () { location.replace(location.pathname + '?neu=' + Date.now()); };
+          var schritte = [];
+          if ('serviceWorker' in navigator) schritte.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+          if (window.caches) schritte.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+          Promise.all(schritte).then(fertig, fertig);
+        };
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
