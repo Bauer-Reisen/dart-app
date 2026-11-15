@@ -91,6 +91,7 @@ export function AtcSpiel(p: SpielProps) {
 
   const e = useEingabe({
     merken: { name: 'atc', id: match.id },
+    zielAnzeige: 'fest',
     zielFuer: (d) => atcZiel(v, nummerVon(mitDarts(d).pos[s])),
     fertigNach: (d) => d.length >= 3 || mitDarts(d).gewinner !== null,
     onFertig: (d) => {
@@ -166,6 +167,7 @@ export function BobsSpiel(p: SpielProps) {
 
   const e = useEingabe({
     merken: { name: 'bobs', id: match.id },
+    zielAnzeige: 'fest',
     zielFuer: () => bobZiel(nummer),
     fertigNach: (d) => d.length >= 3,
     onFertig: (d) => {
@@ -260,6 +262,12 @@ export function DoppelSpiel(p: SpielProps) {
 
   const e = useEingabe({
     merken: { name: 'doppel', id: match.id },
+    zielAnzeige: finish ? 'keine' : 'fest',
+    zielUnbekannt: (d) => {
+      if (!finish) return false;
+      const z = naechsterDart(auswerten(rest, hits(d), true).restNachher, 3 - d.length, true);
+      return !(z.weg && z.weg.length === 1 && z.wurf.ziel.ring === 'D');
+    },
     zielFuer: (d) => {
       if (!finish) return festZiel;
       const a = auswerten(rest, hits(d), true);

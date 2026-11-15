@@ -17,6 +17,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.8.0', titel: 'Ansage bei 501',
+    punkte: [
+      <>Bei <b>501/301</b> kannst du eine <b>Ansage</b> einschalten (Deutsch oder Englisch): Nach jeder Aufnahme sagt die App die Punkte – und im Finish-Bereich z. B. „Alex, you require 32“.</>,
+      <>In den Spielen gibt es <b>keine Zielauswahl</b> mehr – Ziele wählst du nur noch im Training. So bleibt dein Trefferbild sauber.</>,
+      <>Liga: Ist die verbundene Liga von jemand anderem, fragt die App einmal, <b>wem sie gehört</b>, und legt dafür einen eigenen Spieler an.</>,
+    ],
+  },
+  {
     v: '0.7.0', titel: 'Spieler wechseln – überall',
     punkte: [
       <>Auch in <b>Statistik</b> und <b>Liga</b> steht oben <b>Es wirft: …</b> – so schaust du schnell die Statistik von jemand anderem an.</>,

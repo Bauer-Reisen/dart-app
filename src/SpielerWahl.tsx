@@ -58,7 +58,7 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
             <div key={n} className={'spieler-zeile' + (n === aktiv ? ' an' : '')}>
               {bearbeite === n ? (
                 <>
-                  <input autoFocus value={text} maxLength={16} onChange={(e) => setText(e.target.value)}
+                  <input autoFocus value={text} maxLength={24} onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') speichern(n); }} onBlur={() => speichern(n)} aria-label="Neuer Name" />
                   <button className="btn an" onClick={() => speichern(n)}>OK</button>
                 </>
@@ -72,7 +72,7 @@ export function SpielerFenster({ liste, aktiv, onWahl, onNeu, onUmbenennen, onZu
           ))}
         </div>
         <div className="spieler-zeile">
-          <input value={neu} maxLength={16} placeholder="Neuer Spieler" onChange={(e) => setNeu(e.target.value)}
+          <input value={neu} maxLength={24} placeholder="Neuer Spieler" onChange={(e) => setNeu(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') anlegen(); }} />
           <button className="btn" onClick={anlegen} disabled={!nameOk(neu)}>＋</button>
         </div>

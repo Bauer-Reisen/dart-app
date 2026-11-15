@@ -13,7 +13,7 @@ import { laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match
 import { alleSpieler, matchUmbenennen, spielerLaden, spielerSpeichern, umbenennen, type SpielerStand } from './spieler';
 import { SpielerFenster } from './SpielerWahl';
 import { fuehrungLaden, fuehrungSpeichern, type Fuehrung } from './fuehrung';
-import { ligaUmbenennen } from './liga';
+import { LEER, ligaAlle, ligaAlleSetzen, ligaUmbenennen } from './liga';
 
 type Ansicht =
   | { seite: 'start' | 'training' }
@@ -168,6 +168,15 @@ export function App() {
           aufnahmen={aufnahmen}
           ich={ich}
           onSpieler={() => setSpielerOffen(true)}
+          onLigaFuer={(name) => {
+            // Liga vom aktiven Spieler zum genannten verschieben (hat der schon eine eigene Liga, bleibt seine)
+            const m = ligaAlle();
+            const ziel = m[name];
+            if (!ziel || (!ziel.spieltage.length && !ziel.nuliga)) m[name] = m[ich] ?? LEER;
+            delete m[ich];
+            ligaAlleSetzen(m);
+            spielerSetzen({ liste: spieler.liste.includes(name) ? spieler.liste : [...spieler.liste, name], aktiv: name });
+          }}
           onTraining={() => setAnsicht({ seite: 'training' })}
           onNeu={(art) => setAnsicht({ seite: 'neu', art })}
           onComputer={(avg, legs) => {

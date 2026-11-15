@@ -25,6 +25,10 @@ export interface EingabeOpts {
   /** Angefangene Aufnahme (und im Training die Ziele) auf dem Gerät merken, z. B. beim Verlassen übers Menü.
    *  name = Speicherplatz, id = laufendes Spiel (andere id → nichts übernehmen). */
   merken?: { name: string; id?: string };
+  /** Ziel oben: 'wahl' = antippbar (Training), 'fest' = nur anzeigen (Regel gibt es vor), 'keine' = nichts zeigen. Standard: wahl. */
+  zielAnzeige?: 'wahl' | 'fest' | 'keine';
+  /** Ist das Ziel des nächsten Darts unbekannt? Dann zählt er nicht fürs Trefferbild (frei). */
+  zielUnbekannt?: (darts: Dart[]) => boolean;
 }
 
 interface Gemerkt { id?: string; darts: Dart[]; ziel: Ziel | null; chips?: Ziel[] }
@@ -111,7 +115,8 @@ export function useEingabe(o: EingabeOpts) {
       pruefen(liste);
       return;
     }
-    const liste: Dart[] = [...darts, { hit, ziel, t: Date.now(), ...(p ? { p } : {}) }];
+    const frei = o.zielUnbekannt?.(darts) ?? false;
+    const liste: Dart[] = [...darts, { hit, ziel, t: Date.now(), ...(p ? { p } : {}), ...(frei ? { frei } : {}) }];
     if (!o.zielBleibt) setOverride(null);
     pruefen(liste);
   }
@@ -125,7 +130,7 @@ export function useEingabe(o: EingabeOpts) {
     rueckmeldung();
     const letzter = darts[darts.length - 1];
     const liste = [...darts];
-    while (liste.length < 3) liste.push({ hit: letzter.hit, ziel: letzter.ziel, t: Date.now() }); // ohne Stelle: nicht wirklich getippt
+    while (liste.length < 3) liste.push({ hit: letzter.hit, ziel: letzter.ziel, t: Date.now(), ...(letzter.frei ? { frei: true } : {}) }); // ohne Stelle: nicht wirklich getippt
     pruefen(liste);
   }
 
@@ -160,6 +165,7 @@ export function useEingabe(o: EingabeOpts) {
   }
 
   return {
+    zielAnzeige: o.zielAnzeige ?? 'wahl',
     darts, zuletzt, ziel, vorschlag, chips, ersetzen, flash, zoom, wahlOffen,
     treffer, abpraller, dreiGleich, rueckgaengig, feldAntippen,
     chipWaehlen: (z: Ziel) => setOverride(o.zielBleibt || !sameZiel(z, vorschlag) ? z : null),
@@ -192,7 +198,12 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
       <header className="kopf">
         <button className="icon" onClick={onMenu} aria-label="Menü">☰</button>
         <div className="kopf-info">{kopfInfo}</div>
-        <div className="chips">
+        {e.zielAnzeige === 'fest' && (
+          <div className="chips">
+            <span className="chip an fest" aria-label="Ziel">{zielLabel(e.vorschlag)}</span>
+          </div>
+        )}
+        {e.zielAnzeige === 'wahl' && <div className="chips">
           {e.chips.map((c) => (
             <button
               key={zielLabel(c)}
@@ -203,7 +214,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
             </button>
           ))}
           <button className="chip plus" onClick={() => e.setWahlOffen(true)} aria-label="Anderes Ziel">＋</button>
-        </div>
+        </div>}
       </header>
 
       <div className="leiste">

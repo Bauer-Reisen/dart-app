@@ -36,6 +36,8 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
 
   const e = useEingabe({
     merken: { name: 'cricket', id: match.id },
+    zielAnzeige: 'keine',
+    zielUnbekannt: () => true, // man wechselt im selben Wurf das Ziel – unbekannt, also nicht ins Trefferbild
     zielFuer: (d) => zielVon(cricketVorschlag(mitDarts(d), s)[0]),
     fertigNach: (d) => d.length >= 3 || mitDarts(d).gewinner !== null,
     onFertig: (d) => {
@@ -77,7 +79,7 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
           {NUMMERN.map((z, i) => (
             <th key={z} className={offenAlle[i] ? '' : 'zu'}>{z === 25 ? 'B' : z}</th>
           ))}
-          {n > 1 && <th>{variante === 'vergeben' ? 'Minus' : 'Pkt'}</th>}
+          {n > 1 && <th className="pkt-kopf">{variante === 'vergeben' ? 'Minus' : 'Pkt'}</th>}
         </tr>
       </thead>
       <tbody>

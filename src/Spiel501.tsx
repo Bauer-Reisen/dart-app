@@ -1,5 +1,6 @@
 // 501 / 301: Einstellungen und Spielbildschirm.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ansageLaden, ansageMoeglich, ansageSpeichern, entsperren, punkteText, requireText, sprich, type AnsageArt } from './ansage';
 import type { Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
 import { EingabeView, useEingabe } from './Eingabe';
@@ -60,6 +61,12 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
     } catch { /* egal */ }
     return { computer: false, avg: 45, legsZiel: 0 };
   });
+  const [ansage, setAnsage] = useState<AnsageArt>(ansageLaden);
+  function ansageWahl(a: AnsageArt) {
+    setAnsage(a);
+    ansageSpeichern(a);
+    sprich([a === 'en' ? 'One hundred and eighty!' : 'Hundertachtzig!'], a); // Probe – gleichzeitig Freigabe auf iPhone/iPad
+  }
   const mitComputer = art === 'x01' && extra.computer;
   const maxSpieler = mitComputer ? 3 : 4;
 
@@ -162,7 +169,7 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
         </p>
         <p className="info">Triffst du in einer Runde gar nicht, wird dein Punktestand <b>halbiert</b>. Am Ende gewinnen die meisten Punkte.</p>
         <p className="info klein">
-          Doppel- und Triple-Runde: Tippe vor dem Wurf dein Ziel an (z. B. D16), dann zählt der Dart auch fürs Trefferbild.
+          Doppel- und Triple-Runde: Jedes Doppel bzw. Triple zählt. Diese Darts gehen nicht ins Trefferbild ein, weil das Ziel offen ist.
         </p>
       </>}
 
@@ -187,6 +194,16 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
         ))}
       </div>
       {extra.legsZiel > 0 && <p className="info klein">Wer zuerst {extra.legsZiel} Legs gewinnt, gewinnt das Spiel.</p>}
+
+      {ansageMoeglich() && <>
+        <h3>Ansage (Caller)</h3>
+        <div className="ringwahl">
+          {([['aus', 'aus'], ['de', 'Deutsch'], ['en', 'Englisch']] as const).map(([k, t]) => (
+            <button key={k} className={'btn' + (ansage === k ? ' an' : '')} onClick={() => ansageWahl(k)}>{t}</button>
+          ))}
+        </div>
+        {ansage !== 'aus' && <p className="info klein">Nach jeder Aufnahme sagt die App die Punkte an, im Finish-Bereich zum Beispiel „Alex, you require 32“. Ton am Gerät lauter stellen.</p>}
+      </>}
 
       <h3>Computer-Gegner</h3>
       <div className="ringwahl">
@@ -215,7 +232,7 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
         <div className="spielerzeile" key={i}>
           <input
             value={n}
-            maxLength={16}
+            maxLength={24}
             placeholder={`Spieler ${i + 1}`}
             onChange={(ev) => setNamen(namen.map((x, j) => (j === i ? ev.target.value : x)))}
           />
@@ -278,6 +295,12 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
 
   const e = useEingabe({
     merken: { name: 'x01', id: match.id },
+    zielAnzeige: 'keine',
+    // Nur der Wurf aufs Doppel zum Ausmachen hat ein klares Ziel; beim Punkten weiß man nicht, ob T20 oder T19
+    zielUnbekannt: (d) => {
+      const z = naechsterDart(auswerten(rest, hits(d), dOut).restNachher, 3 - d.length, dOut);
+      return !(dOut && z.weg && z.weg.length === 1 && (z.wurf.ziel.ring === 'D'));
+    },
     zielFuer: (d) => {
       const a = auswerten(rest, hits(d), dOut);
       if (a.endetNach !== null) return T20;
@@ -325,6 +348,30 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
     return () => timer.forEach((t) => window.clearTimeout(t));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [botAmZug, leg.id, legAuf.length]);
+
+  // Ansage wie ein Caller: Punkte der letzten Aufnahme, dann „Name, you require N“ für den Nächsten
+  const ansage = useRef<AnsageArt>(ansageLaden());
+  const gesagt = useRef<{ leg: string; n: number } | null>(null);
+  useEffect(() => { entsperren(); }, []);
+  useEffect(() => {
+    const vorher = gesagt.current;
+    gesagt.current = { leg: leg.id, n: legAuf.length };
+    const art = ansage.current;
+    if (art === 'aus') return;
+    if (!vorher || vorher.leg !== leg.id) {
+      // neues Leg: nur im Finish-Bereich (301) gleich ansagen
+      if (vorher && !legAuf.length) { const r = requireText(nameVon(s), rest, dOut, art); if (r) sprich([r], art); }
+      return;
+    }
+    if (legAuf.length <= vorher.n) return; // zurückgenommen
+    const l = legAuf[legAuf.length - 1];
+    const a = auswerten(l.restVorher ?? match.start, hits(l.darts), l.doubleOut ?? dOut);
+    const texte = [punkteText(a.punkte, a.bust, a.check, art)];
+    if (stand.gewinner === null) { const r = requireText(nameVon(s), rest, dOut, art); if (r) texte.push(r); }
+    window.speechSynthesis.cancel();
+    sprich(texte, art);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leg.id, legAuf.length]);
 
   // Anzeige für den Spieler am Zug, mit den schon getippten Darts
   const jetzt = auswerten(rest, hits(e.darts), dOut);

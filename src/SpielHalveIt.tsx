@@ -34,6 +34,8 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
 
   const e = useEingabe({
     merken: { name: 'halveit', id: match.id },
+    zielAnzeige: zielFrei(runde) ? 'keine' : 'fest',
+    zielUnbekannt: () => zielFrei(runde),
     zielFuer: () => ziele[0],
     fertigNach: (d) => d.length >= 3,
     onFertig: (d) => {

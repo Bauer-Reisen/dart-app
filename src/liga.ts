@@ -53,6 +53,8 @@ export interface NuLigaVerbindung {
   person: string;
   name: string;
   stand?: number; // letzte Aktualisierung (ms)
+  /** Nutzer hat bestätigt, dass diese Liga zum aktiven App-Spieler gehört, obwohl die Namen verschieden sind. */
+  bestaetigt?: boolean;
 }
 
 // Liga-Daten je Spieler (mehrere Ligaspieler auf einem Gerät). Speicher: dart-liga-spieler = { Name: LigaDaten }.

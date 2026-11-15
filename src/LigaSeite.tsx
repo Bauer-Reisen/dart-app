@@ -1,8 +1,9 @@
 import { SpielerLeiste } from './SpielerWahl';
+import { anzeigeName } from './spieler';
 import { ICH } from './speicher';
 // Liga-Reiter: nächster Spieltag, Vorbereitungsplan, Computer-Gegner, Ergebnisse, Gegner.
 import { useEffect, useState, type ReactNode } from 'react';
-import { ligaLink, nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort } from './nuligaImport';
+import { ligaLink, nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort, gleicherName } from './nuligaImport';
 import { NuLigaVerbinden } from './NuLigaVerbinden';
 import {
   bilanz, datumText, doppelQuote, gegnerNamen, gegnerVerlauf, gewonnen, heuteText, letzterSpieltag, ligaLaden,
@@ -17,6 +18,8 @@ interface Props {
   ich?: string;
   /** Spieler wechseln (Leiste oben). */
   onSpieler?: () => void;
+  /** Liga einem anderen Spieler geben (wird angelegt, falls neu) und zu ihm wechseln. */
+  onLigaFuer?: (name: string) => void;
   onTraining: () => void;
   onNeu: (art: SpielArt) => void;
   onComputer: (avg: number, legsZiel: number) => void;
@@ -37,7 +40,7 @@ function countdown(tage: number): string {
   return `noch ${tage} Tage`;
 }
 
-export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, onSpieler }: Props) {
+export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, onSpieler, onLigaFuer }: Props) {
   const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden(ich));
   const [bearbeiten, setBearbeiten] = useState<Spieltag | null>(null);
   const [verbinden, setVerbinden] = useState(false);
@@ -134,6 +137,21 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, o
       <h1>Liga</h1>
       {onSpieler && <SpielerLeiste aktiv={ich ?? ICH} onOeffnen={onSpieler} />}
 
+      {daten.nuliga && !daten.nuliga.bestaetigt && !gleicherName(daten.nuliga.name, ich ?? ICH) && onLigaFuer && (
+        <div className="trainings-vorschlag">
+          <h3>Wessen Liga ist das?</h3>
+          <p className="info klein">
+            Verbunden ist die Liga mit <b>{anzeigeName(daten.nuliga.name)}</b>, in der App wirft gerade <b>{ich ?? ICH}</b>.
+            Jeder Spieler hat seine eigene Liga – am besten gehört sie dem, der dort spielt.
+          </p>
+          <button className="btn gross an" style={{ width: '100%', marginTop: 6 }} onClick={() => onLigaFuer(anzeigeName(daten.nuliga!.name))}>
+            Gehört {anzeigeName(daten.nuliga.name)}
+          </button>
+          <button className="btn gross" style={{ width: '100%', marginTop: 6 }} onClick={() => setzen({ ...daten, nuliga: { ...daten.nuliga!, bestaetigt: true } })}>
+            Das bin ich ({ich ?? ICH})
+          </button>
+        </div>
+      )}
       {daten.nuliga && (
         <div className="nuliga-zeile">
           <span>

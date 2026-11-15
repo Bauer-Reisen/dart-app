@@ -41,7 +41,7 @@ export function ligaLink(d: LigaDaten): string | null {
 
 const norm = (n: string) => n.trim().toLowerCase().replace(/\s+/g, ' ');
 /** "Muster, Max" passt zu "Max Muster", "muster" usw. */
-function gleicherName(a: string, b: string): boolean {
+export function gleicherName(a: string, b: string): boolean {
   const ta = norm(a).split(/[ ,&]+/).filter(Boolean);
   const tb = norm(b).split(/[ ,&]+/).filter(Boolean);
   return ta.length > 0 && tb.length > 0 && (ta.every((t) => tb.includes(t)) || tb.every((t) => ta.includes(t)));

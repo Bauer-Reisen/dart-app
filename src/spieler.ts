@@ -27,11 +27,17 @@ export function alleSpieler(s: SpielerStand, aufnahmen: Aufnahme[]): string[] {
   return [...new Set([...s.liste, ...aus])].filter((n) => n && n !== COMPUTER_NAME);
 }
 
+/** nuLiga schreibt „Nachname, Vorname“ – in der App lieber „Vorname Nachname“. */
+export function anzeigeName(n: string): string {
+  const m = n.match(/^\s*([^,]+),\s*(.+)$/);
+  return (m ? `${m[2]} ${m[1]}` : n).trim().replace(/\s+/g, ' ');
+}
+
 export function nameOk(n: string): string | null {
   const t = n.trim().replace(/\s+/g, ' ');
   if (!t) return null;
   if (t.toLowerCase() === COMPUTER_NAME.toLowerCase()) return null;
-  return t.slice(0, 16);
+  return t.slice(0, 24);
 }
 
 /** Spieler umbenennen: alle Würfe, die Spielerliste und laufende Spiele gehen mit. Gibt es den neuen Namen schon, werden beide zusammengeführt. */
