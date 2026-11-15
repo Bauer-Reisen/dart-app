@@ -211,9 +211,11 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
           return (
             <button
               key={i}
-              className={'feld' + (e.ersetzen === i ? ' ersetzen' : '') + (d ? '' : ' leer')}
+              className={'feld' + (e.ersetzen === i ? ' ersetzen' : '') + (d ? '' : ' leer') + (!e.zuletzt && i === e.darts.length ? ' naechster' : '')}
               onClick={() => e.feldAntippen(i)}
+              aria-label={`${i + 1}. Dart`}
             >
+              <span className="nr">{i + 1}.</span>
               {d ? hitLabel(d.hit) : '–'}
             </button>
           );

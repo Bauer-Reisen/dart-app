@@ -17,6 +17,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.4.0', titel: '1., 2. und 3. Dart',
+    punkte: [
+      <>Die Felder oben sind jetzt nummeriert. Tippe die Darts <b>in der Reihenfolge</b> ein, wie du geworfen hast.</>,
+      <>In der <b>Statistik</b> siehst du je Ziel, wie oft dein 1., 2. und 3. Dart trifft – und ob du nach einem Treffer öfter triffst.</>,
+    ],
+  },
+  {
     v: '0.3.0', titel: 'Bullseye und mehr',
     punkte: [
       <>Beim <b>＋</b> gibt es jetzt <b>Bull</b> (unter Single: 25 und 50 zählen) und <b>Bullseye</b> (unter Doppel: nur 50 zählt).</>,
@@ -41,7 +48,7 @@ const KARTEN: { icon: string; titel: string; text: ReactNode }[] = [
   },
   {
     icon: '👆', titel: 'Darts eintippen',
-    text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b>. Daneben? Tippe außen in den grauen Rand. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
+    text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
   },
   {
     icon: '🏋️', titel: 'Training',

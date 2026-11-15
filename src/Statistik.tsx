@@ -4,6 +4,7 @@ import { RUNDEN, rundenName } from './halveit';
 import { wurfbild, wurfbildTipps } from './tipps';
 import { WurfbildHinweis } from './TippFenster';
 import { aussage, klasse, nachbarn, type Klasse } from './klassen';
+import { dartfolge, MIN_N, quoteText } from './dartfolge';
 import { alsDateiSichern, ausDateiLaden, ICH, type Aufnahme } from './speicher';
 import { ligaLaden, ligaSpeichern, type LigaDaten } from './liga';
 import { auswerten, average, istDoppel } from './x01';
@@ -362,6 +363,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen }: Props) {
                 <li><b>Seitlich:</b> {aussage(z.nachbarGegen, z.nachbarUhr, `zur ${n.gegen}`, `zur ${n.uhr}`)}</li>
               </ul>
             )}
+            <DartfolgeZeilen f={dartfolge(meine, z.ziel)} />
             {wurfbildTipps(wurfbild(meineDarts, z.ziel)).map((t) => <WurfbildHinweis key={t.richtung} t={t} />)}
           </div>
         );
@@ -380,6 +382,31 @@ export function Statistik({ aufnahmen: alle, onErsetzen }: Props) {
         <input ref={datei} type="file" accept="application/json,.json" hidden onChange={laden} />
       </div>
       <p className="info klein">Daten liegen nur auf diesem Gerät.</p>
+    </div>
+  );
+}
+
+/** Trefferquote je Dart (1./2./3.) und ob ein Treffer beim nächsten Dart hilft. */
+function DartfolgeZeilen({ f }: { f: ReturnType<typeof dartfolge> }) {
+  if (f.position[0].n + f.position[1].n + f.position[2].n < MIN_N) return null;
+  const nt = f.nachTreffer; const nf = f.nachFehlwurf;
+  let satz: string | null = null;
+  if (nt.n >= MIN_N && nf.n >= MIN_N) {
+    const d = Math.round((nt.treffer / nt.n - nf.treffer / nf.n) * 100);
+    satz = d >= 10 ? `Nach einem Treffer triffst du deutlich öfter (+${d} Prozentpunkte) – du kommst gut in den Rhythmus.`
+      : d <= -10 ? `Nach einem Treffer triffst du seltener (${d} Prozentpunkte) – bleib nach einem Treffer im gleichen Ablauf, nicht nachkorrigieren.`
+      : 'Ob der Dart davor sitzt oder nicht, macht bei dir kaum einen Unterschied.';
+  }
+  return (
+    <div className="dartfolge">
+      <table>
+        <tbody>
+          <tr><td>1. Dart</td><td>{quoteText(f.position[0])}</td><td>nach Treffer</td><td>{quoteText(nt)}</td></tr>
+          <tr><td>2. Dart</td><td>{quoteText(f.position[1])}</td><td>nach Fehlwurf</td><td>{quoteText(nf)}</td></tr>
+          <tr><td>3. Dart</td><td>{quoteText(f.position[2])}</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+      {satz && <p className="info klein">{satz}</p>}
     </div>
   );
 }
