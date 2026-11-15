@@ -22,6 +22,8 @@ export interface Spieltag {
   avgBis?: number;
   spiele: LigaSpiel[];
   notiz?: string;
+  ergebnis?: string;   // Mannschaftsergebnis aus Sicht der eigenen Mannschaft (nuLiga)
+  average?: number;    // eigener Average des Abends laut Spielbericht (nuLiga)
 }
 
 export interface Simulation {
@@ -38,6 +40,19 @@ export interface LigaDaten {
   link?: string;       // Seite der eigenen Liga (z. B. nuLiga)
   spieltage: Spieltag[];
   simulationen: Simulation[];
+  nuliga?: NuLigaVerbindung;
+}
+
+/** Verbindung zu nuLiga: wer man ist und in welcher Liga. */
+export interface NuLigaVerbindung {
+  region: string;
+  staffel: string;
+  staffelName: string;
+  team: string;
+  teamName: string;
+  person: string;
+  name: string;
+  stand?: number; // letzte Aktualisierung (ms)
 }
 
 const KEY = 'dart-liga';
@@ -53,6 +68,7 @@ export function ligaLaden(): LigaDaten {
       link: d.link,
       spieltage: Array.isArray(d.spieltage) ? d.spieltage : [],
       simulationen: Array.isArray(d.simulationen) ? d.simulationen : [],
+      nuliga: d.nuliga,
     };
   } catch {
     return LEER;
@@ -133,6 +149,7 @@ export function staerken(s: Spieltag | null, eigenerAvg: number | null): Staerke
 export const gewonnen = (s: LigaSpiel) => s.legsIch > s.legsGegner;
 
 export function spieltagAverage(s: Spieltag): number | null {
+  if (s.average) return s.average;
   const av = s.spiele.filter((x) => x.art === 'einzel' && x.average).map((x) => x.average!);
   return av.length ? av.reduce((a, b) => a + b, 0) / av.length : null;
 }
@@ -141,7 +158,7 @@ export function bilanz(liste: Spieltag[]) {
   const spiele = liste.flatMap((s) => s.spiele);
   const einzel = spiele.filter((s) => s.art === 'einzel');
   const doppel = spiele.filter((s) => s.art === 'doppel');
-  const avs = einzel.filter((s) => s.average).map((s) => s.average!);
+  const avs = liste.map(spieltagAverage).filter((x): x is number => x !== null); // je Abend
   return {
     einzelSiege: einzel.filter(gewonnen).length,
     einzel: einzel.length,
@@ -194,3 +211,4 @@ export function doppelQuote(aufnahmen: Aufnahme[], seit: number): { quote: numbe
   }
   return { quote: n >= 20 ? t / n : null, n };
 }
+

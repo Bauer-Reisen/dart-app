@@ -1,5 +1,7 @@
 // Liga-Reiter: nächster Spieltag, Vorbereitungsplan, Computer-Gegner, Ergebnisse, Gegner.
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { nuLigaHolen, nuLigaUebernehmen, type NuLigaAntwort } from './nuligaImport';
+import { NuLigaVerbinden } from './NuLigaVerbinden';
 import {
   bilanz, datumText, doppelQuote, gegnerNamen, gegnerVerlauf, gewonnen, heuteText, letzterSpieltag, ligaLaden,
   ligaSpeichern, naechsterSpieltag, phase, sortiert, spieltagAverage, staerken, tageBis, trainingsAverage,
@@ -30,10 +32,51 @@ function countdown(tage: number): string {
 export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
   const [daten, setDaten] = useState<LigaDaten>(() => ligaLaden());
   const [bearbeiten, setBearbeiten] = useState<Spieltag | null>(null);
+  const [verbinden, setVerbinden] = useState(false);
+  const [laedt, setLaedt] = useState(false);
+  const [meldung, setMeldung] = useState<string | null>(null);
 
   function setzen(d: LigaDaten) {
     setDaten(d);
     ligaSpeichern(d);
+  }
+
+  /** Neueste Daten von nuLiga holen und übernehmen. */
+  async function aktualisieren(basis: LigaDaten) {
+    const v = basis.nuliga;
+    if (!v) return;
+    setLaedt(true);
+    setMeldung(null);
+    try {
+      const a = await nuLigaHolen<NuLigaAntwort>('daten', { region: v.region, staffel: v.staffel, team: v.team, person: v.person });
+      const d = nuLigaUebernehmen({ ...ligaLaden(), nuliga: v }, a); // frisch laden, falls inzwischen etwas eingetragen wurde
+      setzen(d);
+    } catch (e) {
+      setMeldung(navigator.onLine ? `Liga-Daten gerade nicht erreichbar (${(e as Error).message}).` : 'Kein Internet – Liga-Daten werden beim nächsten Mal geholt.');
+    } finally {
+      setLaedt(false);
+    }
+  }
+
+  // Beim Öffnen automatisch aktualisieren, wenn die letzten Daten älter als 3 Stunden sind
+  useEffect(() => {
+    const v = daten.nuliga;
+    if (v && (!v.stand || Date.now() - v.stand > 3 * 3600000)) aktualisieren(daten);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (verbinden) {
+    return (
+      <NuLigaVerbinden
+        onAbbruch={() => setVerbinden(false)}
+        onFertig={(v) => {
+          const d = { ...daten, nuliga: v };
+          setzen(d);
+          setVerbinden(false);
+          aktualisieren(d);
+        }}
+      />
+    );
   }
 
   if (bearbeiten) {
@@ -79,10 +122,30 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
     <div className="seite liga">
       <h1>Liga</h1>
 
-      {!daten.spieltage.length && (
+      {daten.nuliga && (
+        <div className="nuliga-zeile">
+          <span>
+            📡 {daten.nuliga.teamName} · {daten.nuliga.name}
+            <br />
+            <small>
+              {laedt
+                ? 'wird aktualisiert …'
+                : daten.nuliga.stand
+                  ? `Stand: ${new Date(daten.nuliga.stand).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} Uhr`
+                  : 'noch nicht geladen'}
+            </small>
+          </span>
+          <button className="btn" disabled={laedt} onClick={() => aktualisieren(daten)} aria-label="Aktualisieren">↻</button>
+        </div>
+      )}
+      {meldung && <p className="info klein">{meldung}</p>}
+
+      {!daten.spieltage.length && !daten.nuliga && (
         <div className="karte">
-          <p>Du spielst in einer Liga? Trag deinen nächsten Spieltag ein. Die App plant dann deine Vorbereitung bis dahin und stellt den Computer-Gegner auf die Stärke der Gegner ein.</p>
-          <button className="btn gross los" onClick={neuerSpieltag}>＋ Spieltag eintragen</button>
+          <p>Du spielst in einer Liga? Dann plant die App deine Vorbereitung bis zum nächsten Spieltag und stellt den Computer-Gegner auf die Stärke der Gegner ein.</p>
+          <button className="btn gross los an" onClick={() => setVerbinden(true)}>Mit meiner Liga verbinden</button>
+          <p className="info klein">Für Ligen des Bayerischen Dart-Verbands (nuLiga): Spielplan, Gegner-Stärke und deine Ergebnisse kommen dann von selbst.</p>
+          <button className="btn breit" onClick={neuerSpieltag}>＋ Spieltag von Hand eintragen</button>
         </div>
       )}
 
@@ -99,7 +162,7 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
         </button>
       )}
 
-      {letzter && !letzter.spiele.length && (
+      {letzter && !letzter.spiele.length && !letzter.ergebnis && (
         <button className="kachel nachtragen" onClick={() => setBearbeiten(letzter)}>
           <b>Wie lief es {letzter.heim ? 'gegen' : 'bei'} {letzter.gegner}?</b>
           <span>{datumText(letzter.datum)} · Ergebnisse und Notizen eintragen</span>
@@ -143,7 +206,7 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
             <span className="erg">
               {s.spiele.length
                 ? `${ein.filter(gewonnen).length} von ${ein.length} ✓${av ? ` · Ø ${av.toFixed(1).replace('.', ',')}` : ''}`
-                : t < 0 ? 'nachtragen' : ''}
+                : s.ergebnis ? `Team ${s.ergebnis}` : t < 0 ? 'nachtragen' : ''}
             </span>
           </button>
         );
@@ -153,6 +216,19 @@ export function Liga({ aufnahmen, onTraining, onNeu, onComputer }: Props) {
       <Gegner daten={daten} />
 
       <h3>Einstellungen</h3>
+      {daten.nuliga ? (
+        <div className="ringwahl">
+          <button className="btn" onClick={() => setVerbinden(true)}>Liga/Namen ändern</button>
+          <button
+            className="btn"
+            onClick={() => { if (confirm('Verbindung zur Liga trennen? Deine Spieltage bleiben.')) setzen({ ...daten, nuliga: undefined }); }}
+          >
+            Trennen
+          </button>
+        </div>
+      ) : (
+        <button className="btn breit" onClick={() => setVerbinden(true)}>📡 Mit meiner Liga verbinden (nuLiga)</button>
+      )}
       <p className="info klein">Länge eines Spiels in deiner Liga</p>
       <div className="ringwahl">
         {[2, 3, 4].map((k) => (

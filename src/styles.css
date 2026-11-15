@@ -423,3 +423,8 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; color:
   .aufgabe span { font-size: 16px; }
   .countdown { font-size: 36px; }
 }
+.nuliga-zeile { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -6px 0 12px; color: var(--leise); font-size: 14px; }
+.nuliga-zeile small { font-size: 12px; }
+.nuliga-zeile .btn { flex: none; width: 44px; height: 40px; font-size: 18px; }
+.wahlliste .zeile-spieltag { grid-template-columns: 1fr auto; }
+.wahlliste .zeile-spieltag .wer { white-space: normal; }
