@@ -9,7 +9,7 @@ export type Ring = 'DB' | 'SB' | 'SI' | 'T' | 'SO' | 'D' | 'MISS' | 'BOUNCE';
 
 /** Außenradius jedes Rings (verzerrt: Triple und Doppel sind dick). */
 // Breiten: Single innen 50, Triple 30, Single außen 30, Doppel 30, Daneben 22.
-export const RADIUS = { DB: 15, SB: 30, SI: 80, T: 110, SO: 140, D: 170, MISS: 192 } as const;
+export const RADIUS = { DB: 15, SB: 30, SI: 78, T: 104, SO: 144, D: 170, MISS: 192 } as const;
 
 export interface Hit {
   seg: number; // 1–20, 25 für Bull, 0 für Abpraller

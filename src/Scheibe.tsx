@@ -26,7 +26,7 @@ interface Props {
  */
 function viewBox(ziel: Ziel, zoom: boolean): string {
   if (!zoom || ziel.seg === 25) return '-200 -200 400 400';
-  const r = ziel.ring === 'D' ? (RADIUS.SO + RADIUS.D) / 2 : ziel.ring === 'T' ? (RADIUS.SI + RADIUS.T) / 2 : 110;
+  const r = ziel.ring === 'D' ? (RADIUS.SO + RADIUS.D) / 2 : ziel.ring === 'T' ? (RADIUS.SI + RADIUS.T) / 2 : (RADIUS.T + RADIUS.SO) / 2;
   const w = ziel.ring === 'D' ? 170 : ziel.ring === 'T' ? 180 : 230;
   const h = w * 1.25;
   const [cx, cy] = polar(r, segAngle(ziel.seg));
