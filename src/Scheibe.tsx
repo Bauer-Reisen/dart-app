@@ -20,24 +20,31 @@ interface Props {
   onHit: (h: Hit, punkt: [number, number]) => void;
 }
 
+/** Sichtbarer Ausschnitt: Mitte und Größe in Scheiben-Einheiten. */
+interface Ansicht { cx: number; cy: number; w: number; h: number }
+
+const GANZ: Ansicht = { cx: 0, cy: 0, w: 400, h: 400 };
+const MIN_W = 90;       // weiter rein geht es nicht
+const RAND = 220;       // so weit darf die Mitte von der Scheibenmitte weg
+
 /**
- * Ausschnitt beim Zoom: Die Scheibe bleibt, wie sie an der Wand hängt.
+ * Ausschnitt der Lupe: Die Scheibe bleibt, wie sie an der Wand hängt.
  * Es wird nur auf die Stelle des Ziels vergrößert (Ziel in der Mitte, Nachbarn drumherum).
  */
-function viewBox(ziel: Ziel, zoom: boolean, [vx, vy]: [number, number] = [0, 0]): string {
-  if (!zoom) return '-200 -200 400 400';
-  if (ziel.seg === 25) return `${(-120 + vx).toFixed(1)} ${(-150 + vy).toFixed(1)} 240 300`;
+function lupenAnsicht(ziel: Ziel): Ansicht {
+  if (ziel.seg === 25) return { cx: 0, cy: 0, w: 240, h: 300 };
   const r = ziel.ring === 'D' ? (RADIUS.SO + RADIUS.D) / 2 : ziel.ring === 'T' ? (RADIUS.SI + RADIUS.T) / 2 : (RADIUS.T + RADIUS.SO) / 2;
   const w = ziel.ring === 'D' ? 170 : ziel.ring === 'T' ? 180 : 230;
-  const h = w * 1.25;
-  const [px, py] = polar(r, segAngle(ziel.seg));
-  const cx = px + vx;
-  const cy = py + vy;
-  return `${(cx - w / 2).toFixed(1)} ${(cy - h / 2).toFixed(1)} ${w} ${h.toFixed(1)}`;
+  const [cx, cy] = polar(r, segAngle(ziel.seg));
+  return { cx, cy, w, h: w * 1.25 };
 }
+
+const vbText = (a: Ansicht) =>
+  `${(a.cx - a.w / 2).toFixed(1)} ${(a.cy - a.h / 2).toFixed(1)} ${a.w.toFixed(1)} ${a.h.toFixed(1)}`;
 
 export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
   const g = useRef<SVGGElement>(null);
+  const svg = useRef<SVGSVGElement>(null);
   const rot = 0; // nie drehen: die Scheibe sieht immer aus wie in echt
 
   const felder = useMemo(() => {
@@ -73,18 +80,17 @@ export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
     );
   });
 
-  // Lupe: mit zwei Fingern verschieben. Damit der erste Finger dabei nicht als Dart zählt,
-  // gilt ein Tippen in der Lupe erst beim Loslassen – und nur, wenn kein zweiter Finger dazukam.
-  const [versatz, setVersatz] = useState<[number, number]>([0, 0]);
-  useEffect(() => { setVersatz([0, 0]); }, [zoom, ziel.seg, ziel.ring]);
+  // Eigener Ausschnitt aus Zwei-Finger-Zoom; null = Standard (ganze Scheibe oder Lupe aufs Ziel).
+  // Die Lupe (an/aus) setzt ihn zurück. Neue Ziele ändern ihn nicht – sonst spränge das Bild nach jedem Dart.
+  const [eigen, setEigen] = useState<Ansicht | null>(null);
+  useEffect(() => { setEigen(null); }, [zoom]);
+  const ansicht = eigen ?? (zoom ? lupenAnsicht(ziel) : GANZ);
+
+  // Ein Finger tippt (zählt beim Loslassen), zwei Finger ziehen auf/zu und verschieben.
   const finger = useRef(new Map<number, [number, number]>());
   const offen = useRef<{ id: number; p: [number, number] } | null>(null);
-  const geschoben = useRef(false);
-  const mitte = () => {
-    const l = [...finger.current.values()];
-    return [l.reduce((a, b) => a + b[0], 0) / l.length, l.reduce((a, b) => a + b[1], 0) / l.length] as [number, number];
-  };
-  const letzteMitte = useRef<[number, number] | null>(null);
+  const geste = useRef<{ ansicht: Ansicht; abstand: number; punkt: [number, number]; mitte: [number, number]; proPx: number } | null>(null);
+  const mehrfinger = useRef(false);
 
   function scheibenPunkt(x: number, y: number): [number, number] | null {
     const m = g.current?.getScreenCTM();
@@ -93,50 +99,69 @@ export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
     return [p.x, p.y];
   }
 
+  function zweiFinger(): { mitte: [number, number]; abstand: number } {
+    const [a, b] = [...finger.current.values()];
+    return { mitte: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], abstand: Math.max(10, Math.hypot(a[0] - b[0], a[1] - b[1])) };
+  }
+
+  function gesteStarten() {
+    const { mitte, abstand } = zweiFinger();
+    const punkt = scheibenPunkt(mitte[0], mitte[1]);
+    const m = g.current?.getScreenCTM();
+    if (!punkt || !m) return;
+    geste.current = { ansicht, abstand, punkt, mitte, proPx: 1 / m.a };
+  }
+
   function down(e: React.PointerEvent<SVGSVGElement>) {
     e.preventDefault();
-    const p = scheibenPunkt(e.clientX, e.clientY);
-    if (!p) return;
-    if (!zoom) { onHit(hitAt(p[0], p[1]), p); return; }
+    try { svg.current?.setPointerCapture(e.pointerId); } catch { /* egal */ }
     finger.current.set(e.pointerId, [e.clientX, e.clientY]);
     if (finger.current.size === 1) {
-      geschoben.current = false;
-      offen.current = { id: e.pointerId, p };
+      mehrfinger.current = false;
+      const p = scheibenPunkt(e.clientX, e.clientY);
+      offen.current = p ? { id: e.pointerId, p } : null;
     } else {
-      offen.current = null; // zweiter Finger: verschieben statt tippen
-      geschoben.current = true;
-      letzteMitte.current = mitte();
+      offen.current = null; // zweiter Finger: kein Dart, sondern zoomen/verschieben
+      mehrfinger.current = true;
+      if (finger.current.size === 2) gesteStarten();
     }
   }
 
   function move(e: React.PointerEvent<SVGSVGElement>) {
-    if (!zoom || !finger.current.has(e.pointerId)) return;
+    if (!finger.current.has(e.pointerId)) return;
     finger.current.set(e.pointerId, [e.clientX, e.clientY]);
-    if (finger.current.size < 2 || !letzteMitte.current) return;
-    const neu = mitte();
-    const m = g.current?.getScreenCTM();
-    const proPx = m ? 1 / m.a : 1;
-    const dx = (neu[0] - letzteMitte.current[0]) * proPx;
-    const dy = (neu[1] - letzteMitte.current[1]) * proPx;
-    letzteMitte.current = neu;
-    const grenze = (v: number) => Math.max(-220, Math.min(220, v));
-    setVersatz(([x, y]) => [grenze(x - dx), grenze(y - dy)]);
+    const st = geste.current;
+    const el = svg.current;
+    if (finger.current.size !== 2 || !st || !el) return;
+    const { mitte, abstand } = zweiFinger();
+    // neue Größe: Finger auseinander = näher ran
+    const w = Math.min(GANZ.w, Math.max(MIN_W, st.ansicht.w * (st.abstand / abstand)));
+    const faktor = w / st.ansicht.w;
+    const h = st.ansicht.h * faktor;
+    const proPx = st.proPx * faktor;
+    // der Punkt unter den Fingern bleibt unter den Fingern
+    const r = el.getBoundingClientRect();
+    const sx = r.left + r.width / 2;
+    const sy = r.top + r.height / 2;
+    const grenze = (v: number) => Math.max(-RAND, Math.min(RAND, v));
+    const cx = grenze(st.punkt[0] - (mitte[0] - sx) * proPx);
+    const cy = grenze(st.punkt[1] - (mitte[1] - sy) * proPx);
+    setEigen(w >= GANZ.w ? GANZ : { cx, cy, w, h }); // ganz rausgezogen: wieder die ganze Scheibe
   }
 
   function up(e: React.PointerEvent<SVGSVGElement>) {
-    if (!zoom) return;
     finger.current.delete(e.pointerId);
-    if (finger.current.size >= 2) letzteMitte.current = mitte();
-    else letzteMitte.current = null;
+    if (finger.current.size === 2) gesteStarten();
+    else geste.current = null;
     const o = offen.current;
-    if (e.type === 'pointerup' && o && o.id === e.pointerId && !geschoben.current) onHit(hitAt(o.p[0], o.p[1]), o.p);
+    if (e.type === 'pointerup' && o && o.id === e.pointerId && !mehrfinger.current) onHit(hitAt(o.p[0], o.p[1]), o.p);
     if (o?.id === e.pointerId) offen.current = null;
   }
 
   const fp = flash ? hitPath(flash.hit) : null;
 
   return (
-    <svg className="board" viewBox={viewBox(ziel, zoom, versatz)} preserveAspectRatio="xMidYMid meet"
+    <svg ref={svg} className="board" viewBox={vbText(ansicht)} preserveAspectRatio="xMidYMid meet"
       onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
       <g ref={g} transform={`rotate(${rot})`}>
         {/* alles außerhalb der Scheibe zählt als "daneben" */}
