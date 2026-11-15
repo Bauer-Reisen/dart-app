@@ -43,6 +43,11 @@
         setTimeout(zeigen, 4000);
         function neuLaden() { location.replace(location.pathname + '?neu=' + Date.now()); }
         function speicherLeeren() {
+          // Ohne Internet NICHT leeren – sonst ist auch die Offline-Fassung weg
+          if (navigator.onLine === false) {
+            alert('Du bist gerade offline. Bitte mit dem Internet verbinden und dann nochmal tippen.');
+            return;
+          }
           var schritte = [];
           if ('serviceWorker' in navigator) schritte.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
           if (window.caches) schritte.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
