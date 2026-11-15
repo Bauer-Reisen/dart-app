@@ -12,31 +12,53 @@
     <link rel="icon" type="image/png" href="icons/icon-192.png" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <title>Dart-Training</title>
-    <script type="module" crossorigin src="./assets/index-DzVc6BVx.js"></script>
+    <script type="module" crossorigin src="./assets/index-B_zpuUjd.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-rLBNUtpi.css">
   </head>
   <body>
     <div id="root"></div>
-    <!-- Notfall: Bleibt die Seite leer (z. B. alte gespeicherte Fassung), nach 6 s einen Knopf zeigen,
-         der den Offline-Speicher der App-Dateien leert und neu lädt. Würfe und Spiele bleiben erhalten. -->
+    <!-- Notfall: Bleibt die Seite leer (alte gespeicherte Fassung oder ein Fehler), Hinweis mit Fehlertext und zwei Knöpfen zeigen.
+         „App neu laden" leert den Offline-Speicher der App-Dateien; „Zwischenstände zurücksetzen" löscht laufende Spiele,
+         angefangene Aufnahmen und Hinweis-Stand. Die Würfe (Statistik) bleiben in beiden Fällen erhalten. -->
     <div id="notfall" style="display:none;padding:32px 20px;font:17px/1.4 system-ui,sans-serif;color:#f2f2f2;background:#111;min-height:100vh;box-sizing:border-box">
-      <p style="margin:0 0 16px"><b>Die App lädt gerade nicht richtig.</b></p>
-      <p style="margin:0 0 20px">Tippe auf den Knopf – die App lädt dann frisch vom Server. Deine Würfe und Spiele bleiben erhalten.</p>
-      <button id="notfall-knopf" style="font:inherit;font-weight:700;padding:14px 20px;border:0;border-radius:12px;background:#ffd23f;color:#111">App neu laden</button>
+      <p style="margin:0 0 12px"><b>Die App lädt gerade nicht richtig.</b></p>
+      <p style="margin:0 0 18px">Probiere zuerst den gelben Knopf. Hilft das nicht, den grauen. Deine Würfe bleiben in beiden Fällen erhalten.</p>
+      <p><button id="notfall-knopf" style="font:inherit;font-weight:700;padding:14px 20px;border:0;border-radius:12px;background:#ffd23f;color:#111">1. App neu laden</button></p>
+      <p><button id="notfall-reset" style="font:inherit;padding:14px 20px;border:0;border-radius:12px;background:#333;color:#f2f2f2">2. Laufende Spiele und Zwischenstände zurücksetzen</button></p>
+      <p style="margin-top:24px;font-size:13px;color:#9a9a9a">Fehler (bitte abfotografieren):<br /><span id="notfall-text">keiner gemeldet</span></p>
     </div>
     <script>
       (function () {
-        setTimeout(function () {
+        var fehler = [];
+        function zeigen() {
           var root = document.getElementById('root');
           if (root && root.children.length) return;
+          document.getElementById('notfall-text').textContent =
+            (fehler.length ? fehler.join(' | ') : 'keiner gemeldet') + ' · ' + navigator.userAgent;
           document.getElementById('notfall').style.display = 'block';
-        }, 6000);
-        document.getElementById('notfall-knopf').onclick = function () {
-          var fertig = function () { location.replace(location.pathname + '?neu=' + Date.now()); };
+        }
+        window.addEventListener('error', function (e) {
+          fehler.push((e.message || 'Fehler') + (e.filename ? ' @' + e.filename.split('/').pop() + ':' + e.lineno : ''));
+          setTimeout(zeigen, 300);
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) { fehler.push('Promise: ' + ((e.reason && e.reason.message) || e.reason)); });
+        setTimeout(zeigen, 4000);
+        function neuLaden() { location.replace(location.pathname + '?neu=' + Date.now()); }
+        function speicherLeeren() {
           var schritte = [];
           if ('serviceWorker' in navigator) schritte.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
           if (window.caches) schritte.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
-          Promise.all(schritte).then(fertig, fertig);
+          Promise.all(schritte).then(neuLaden, neuLaden);
+        }
+        document.getElementById('notfall-knopf').onclick = speicherLeeren;
+        document.getElementById('notfall-reset').onclick = function () {
+          try {
+            Object.keys(localStorage).forEach(function (k) {
+              if (/^dart-(x01|cricket|halveit|atc|bobs|doppel)-laufend$/.test(k) || k.indexOf('dart-offen-') === 0 ||
+                  k === 'dart-fuehrung' || k === 'dart-hilfe' || k === 'dart-reiter') localStorage.removeItem(k);
+            });
+          } catch (e) { /* egal */ }
+          speicherLeeren();
         };
       })();
     </script>
