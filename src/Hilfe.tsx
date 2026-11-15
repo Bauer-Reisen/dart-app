@@ -17,6 +17,12 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.8.5', titel: 'Lupe verschieben',
+    punkte: [
+      <>In der <b>Lupe 🔍</b> schiebst du die Scheibe mit <b>zwei Fingern</b> hin und her. Ein Dart zählt in der Lupe, sobald du den Finger loslässt.</>,
+    ],
+  },
+  {
     v: '0.8.1', titel: 'Reihenfolge ändern',
     punkte: [
       <>Vor dem Spiel kannst du die Spieler mit <b>↑ ↓</b> umsortieren – z. B. nach dem Ausbullen: Wer gewinnt, kommt nach oben und fängt an.</>,
