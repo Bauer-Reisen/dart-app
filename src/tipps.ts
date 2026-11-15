@@ -121,7 +121,7 @@ function zuRichtung([dx, dy]: [number, number]): Richtung {
 /** Wohin ging der Fehlwurf, so wie man auf die Scheibe schaut? null = Treffer, Abpraller oder unklar. */
 export function richtung(z: Ziel, h: Hit): Richtung | null {
   if (h.ring === 'BOUNCE') return null;
-  if (z.ring === 'B') {
+  if (z.seg === 25) {
     if (h.ring === 'DB' || h.ring === 'SB' || h.seg < 1 || h.seg > 20) return null;
     return zuRichtung(polar(1, segAngle(h.seg)));
   }

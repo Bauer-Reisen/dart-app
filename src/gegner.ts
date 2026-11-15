@@ -23,7 +23,7 @@ export function echterTreffer(x: number, y: number): Hit {
 
 /** Zielpunkt (Mitte des Feldes). */
 export function zielPunkt(z: Ziel): [number, number] {
-  if (z.ring === 'B') return [0, 0];
+  if (z.seg === 25) return [0, 0];
   const r = z.ring === 'T' ? 103 : z.ring === 'D' ? 166 : 134; // Single: großes äußeres Feld
   return polar(r, segAngle(z.seg));
 }

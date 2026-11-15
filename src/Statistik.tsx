@@ -339,7 +339,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen }: Props) {
       {zeilen.length > 0 && <h3>Trefferbild je Ziel</h3>}
 
       {zeilen.map((z) => {
-        const n = z.ziel.ring === 'B' ? null : nachbarn(z.ziel.seg);
+        const n = z.ziel.seg === 25 ? null : nachbarn(z.ziel.seg);
         const quote = Math.round((z.treffer / z.wuerfe) * 100);
         return (
           <div className="karte" key={zielLabel(z.ziel)}>

@@ -269,6 +269,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
   const nameVon = (i: number) => (bot?.platz === i ? 'Computer' : match.spieler[i]);
 
   const e = useEingabe({
+    merken: { name: 'x01', id: match.id },
     zielFuer: (d) => {
       const a = auswerten(rest, hits(d), dOut);
       if (a.endetNach !== null) return T20;

@@ -19,7 +19,8 @@ export function nachbarn(seg: number): { uhr: number; gegen: number } {
 
 export function klasse(z: Ziel, h: Hit): Klasse {
   if (h.ring === 'BOUNCE') return 'abpraller';
-  if (z.ring === 'B') return h.ring === 'DB' || h.ring === 'SB' ? 'treffer' : 'weit';
+  if (z.seg === 25 && z.ring === 'D') return h.ring === 'DB' ? 'treffer' : h.ring === 'SB' ? 'aussen' : 'weit';
+  if (z.seg === 25) return h.ring === 'DB' || h.ring === 'SB' ? 'treffer' : 'weit';
   if (h.seg === 25) return 'innen';
 
   if (h.seg === z.seg) {

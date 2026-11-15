@@ -206,7 +206,7 @@ export function doppelQuote(aufnahmen: Aufnahme[], seit: number): { quote: numbe
     for (const d of a.darts) {
       if (d.frei || d.ziel.ring !== 'D') continue;
       n++;
-      if (d.hit.ring === 'D' && d.hit.seg === d.ziel.seg) t++;
+      if ((d.hit.ring === 'D' || d.hit.ring === 'DB') && d.hit.seg === d.ziel.seg) t++;
     }
   }
   return { quote: n >= 20 ? t / n : null, n };

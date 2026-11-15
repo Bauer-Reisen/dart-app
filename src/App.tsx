@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Reiterleiste, Start, type Reiter } from './Start';
 import { Statistik } from './Statistik';
 import { Tipps } from './TippsSeite';
+import { Rundgang, StartHilfe } from './Hilfe';
 import { Training } from './Training';
 import { SpielNeu, X01Spiel, computerMatch } from './Spiel501';
 import { Liga } from './LigaSeite';
@@ -25,6 +26,7 @@ export function App() {
     doppel: matchLaden('doppel'),
   }));
   const [ansicht, setAnsicht] = useState<Ansicht>({ seite: 'start' });
+  const [rundgang, setRundgang] = useState(false);
   const [reiter, setReiter] = useState<Reiter>(() => {
     try {
       const r = localStorage.getItem('dart-reiter');
@@ -114,7 +116,7 @@ export function App() {
       {reiter === 'statistik' ? (
         <Statistik aufnahmen={aufnahmen} onErsetzen={alleSetzen} />
       ) : reiter === 'tipps' ? (
-        <Tipps />
+        <Tipps onRundgang={() => setRundgang(true)} />
       ) : reiter === 'liga' ? (
         <Liga
           aufnahmen={aufnahmen}
@@ -137,6 +139,8 @@ export function App() {
         />
       )}
       <Reiterleiste aktiv={reiter} onWahl={reiterWaehlen} />
+      <StartHilfe />
+      {rundgang && <Rundgang onFertig={() => setRundgang(false)} />}
     </div>
   );
 }

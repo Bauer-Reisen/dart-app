@@ -1,5 +1,5 @@
 // 💡: Tipps zur Übung und Hinweise aus dem eigenen Wurfbild.
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { zielLabel, type Hit, type Ziel } from './board';
 import { MIN_FEHL, UEBUNGS_TIPPS, wurfbild, wurfbildTipps, type TippArt, type WurfbildTipp } from './tipps';
 
@@ -7,6 +7,8 @@ export interface TippQuelle {
   art: TippArt;
   /** Alle bisherigen Darts des Spielers am Zug. */
   darts: { hit: Hit; ziel: Ziel; frei?: boolean }[];
+  /** Kurze Erklärung der Seite, oben im Fenster („So geht's"). */
+  soGehts?: ReactNode;
 }
 
 export function WurfbildHinweis({ t }: { t: WurfbildTipp }) {
@@ -45,6 +47,7 @@ export function useTipp(q: TippQuelle | undefined, ziel: Ziel) {
     <div className="wahl mitte" onClick={() => setOffen(false)}>
       <div className="wahl-box tipp-box" onClick={(ev) => ev.stopPropagation()}>
         <h3>💡 Tipps</h3>
+        {q.soGehts && (<><h4>So geht's</h4>{q.soGehts}</>)}
 
         <h4>Dein Wurfbild auf {zielLabel(ziel)}</h4>
         {hinweise.length > 0 ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Ziel, ZielRing } from './board';
+import type { Ziel } from './board';
 
 interface Props {
   aktuell: Ziel;
@@ -9,8 +9,9 @@ interface Props {
 
 const ZAHLEN = Array.from({ length: 20 }, (_, i) => i + 1);
 
+/** Bull je Ring: Single = ganzes Bull (25 und 50 zählen), Doppel = nur Bullseye (50), Triple gibt es beim Bull nicht. */
 export function ZielWahl({ aktuell, onWahl, onAbbruch }: Props) {
-  const [ring, setRing] = useState<Exclude<ZielRing, 'B'>>(aktuell.ring === 'B' ? 'T' : aktuell.ring);
+  const [ring, setRing] = useState<'S' | 'D' | 'T'>(aktuell.ring === 'B' ? 'S' : aktuell.ring);
   return (
     <div className="wahl" onClick={onAbbruch}>
       <div className="wahl-box" onClick={(e) => e.stopPropagation()}>
@@ -26,7 +27,12 @@ export function ZielWahl({ aktuell, onWahl, onAbbruch }: Props) {
           {ZAHLEN.map((n) => (
             <button key={n} className="btn" onClick={() => onWahl({ seg: n, ring })}>{ring}{n}</button>
           ))}
-          <button className="btn bull" onClick={() => onWahl({ seg: 25, ring: 'B' })}>Bull</button>
+          {ring === 'S' && (
+            <button className="btn bull" onClick={() => onWahl({ seg: 25, ring: 'B' })}>Bull (25 und 50 zählen)</button>
+          )}
+          {ring === 'D' && (
+            <button className="btn bull" onClick={() => onWahl({ seg: 25, ring: 'D' })}>Bullseye (nur 50 zählt)</button>
+          )}
         </div>
       </div>
     </div>

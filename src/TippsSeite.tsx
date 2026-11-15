@@ -3,10 +3,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { checkout, wegText } from './checkout';
 import { THEMEN } from './tipps';
 
-export function Tipps() {
+export function Tipps({ onRundgang }: { onRundgang: () => void }) {
   const [offen, setOffen] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
-  useEffect(() => { window.scrollTo(0, 0); }, [offen]);
+  // Aufgeklapptes Thema nach oben holen, damit man seinen Anfang sieht
+  useEffect(() => {
+    if (offen) document.getElementById('thema-' + offen)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [offen]);
 
   const tabelle = useMemo(() => {
     const zeilen: { rest: number; weg: string | null }[] = [];
@@ -25,7 +28,7 @@ export function Tipps() {
       <h1>Tipps</h1>
 
       {THEMEN.map((t) => (
-        <div key={t.titel} className={'thema' + (offen === t.titel ? ' offen' : '')}>
+        <div key={t.titel} id={'thema-' + t.titel} className={'thema' + (offen === t.titel ? ' offen' : '')}>
           <button className="thema-kopf" onClick={() => umschalten(t.titel)} aria-expanded={offen === t.titel}>
             <span><b>{t.titel}</b><small>{t.kurz}</small></span>
             <span className="pfeil">›</span>
@@ -38,7 +41,7 @@ export function Tipps() {
         </div>
       ))}
 
-      <div className={'thema' + (offen === 'checkout' ? ' offen' : '')}>
+      <div id="thema-checkout" className={'thema' + (offen === 'checkout' ? ' offen' : '')}>
         <button className="thema-kopf" onClick={() => umschalten('checkout')} aria-expanded={offen === 'checkout'}>
           <span><b>Checkout-Tabelle</b><small>Wege von 170 bis 2, mit Doppel ausmachen</small></span>
           <span className="pfeil">›</span>
@@ -73,6 +76,7 @@ export function Tipps() {
         Die Tipps sind Anstöße nach gängigen Trainingsgrundlagen und ersetzen keinen Trainer.
         Passende Tipps zu deinem eigenen Wurfbild findest du in der Statistik und im Training unter 💡.
       </p>
+      <button className="btn breit" onClick={onRundgang}>Rundgang durch die App ansehen</button>
     </div>
   );
 }

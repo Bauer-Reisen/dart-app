@@ -35,6 +35,7 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
   const mitDarts = (d: Dart[]) => cricketStand(n, leg.starter, [...liste, { hits: hits(d) }], variante);
 
   const e = useEingabe({
+    merken: { name: 'cricket', id: match.id },
     zielFuer: (d) => zielVon(cricketVorschlag(mitDarts(d), s)[0]),
     fertigNach: (d) => d.length >= 3 || mitDarts(d).gewinner !== null,
     onFertig: (d) => {

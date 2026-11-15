@@ -1,0 +1,141 @@
+// Hilfe wie in der Film-App:
+// - Rundgang: beim allerersten Öffnen ein paar Karten nacheinander, jederzeit überspringbar (Tipps → „Rundgang ansehen").
+// - „Was ist neu?": nach einem Update einmal, wenn man den Rundgang schon kennt. Nur für neue Funktionen, die man bemerkt.
+// - Einmal-Hinweise: kurze Erklärung beim ersten Öffnen einer Seite.
+import { useState, type ReactNode } from 'react';
+
+interface HilfeStand { rundgang?: boolean; neuGesehen?: string; einmal?: string[] }
+const SCHLUESSEL = 'dart-hilfe';
+
+function stand(): HilfeStand {
+  try { return JSON.parse(localStorage.getItem(SCHLUESSEL) ?? '{}') ?? {}; } catch { return {}; }
+}
+function setzen(s: Partial<HilfeStand>) {
+  try { localStorage.setItem(SCHLUESSEL, JSON.stringify({ ...stand(), ...s })); } catch { /* egal */ }
+}
+
+// ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
+export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
+  {
+    v: '0.3.0', titel: 'Bullseye und mehr',
+    punkte: [
+      <>Beim <b>＋</b> gibt es jetzt <b>Bull</b> (unter Single: 25 und 50 zählen) und <b>Bullseye</b> (unter Doppel: nur 50 zählt).</>,
+      <>Gehst du mitten in einer Aufnahme übers <b>☰ Menü</b> raus, sind die getippten Darts beim Zurückkommen noch da.</>,
+    ],
+  },
+];
+const NEUSTE = NEUES[0].v;
+
+const zahl = (v: string) => v.split('.').map(Number);
+function neuer(a: string, b: string) {
+  const x = zahl(a); const y = zahl(b);
+  for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
+  return false;
+}
+
+// ---------------- Rundgang ----------------
+const KARTEN: { icon: string; titel: string; text: ReactNode }[] = [
+  {
+    icon: '🎯', titel: 'Willkommen!',
+    text: <>Hier trainierst du Steeldarts und siehst, wo du dich verbesserst. Unten wechselst du zwischen den Bereichen <b>Training</b>, <b>Spiele</b>, <b>Liga</b>, <b>Statistik</b> und <b>Tipps</b>.</>,
+  },
+  {
+    icon: '👆', titel: 'Darts eintippen',
+    text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b>. Daneben? Tippe außen in den grauen Rand. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
+  },
+  {
+    icon: '🏋️', titel: 'Training',
+    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wohin du danebenwirfst. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
+  },
+  {
+    icon: '🎮', titel: 'Spiele',
+    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor.</>,
+  },
+  {
+    icon: '🏆', titel: 'Liga',
+    text: <>Spielst du in einer Liga? Verbinde die App mit deiner Liga (Bayerischer Dart-Verband) oder trag Spieltage selbst ein. Dann bekommst du einen Plan bis zum nächsten Spieltag.</>,
+  },
+  {
+    icon: '📊', titel: 'Statistik und 💡',
+    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote und dein Trefferbild. Leuchtet im Spiel die <b>💡</b>, hat die App einen Hinweis zu deinem Wurfbild für dich.</>,
+  },
+  {
+    icon: '💾', titel: 'Deine Daten',
+    text: <>Alles bleibt nur auf diesem Gerät, ohne Anmeldung. Unter <b>Statistik → Als Datei sichern</b> machst du ab und zu eine Sicherung. Den Rundgang findest du wieder unter <b>Tipps</b>.</>,
+  },
+];
+
+export function Rundgang({ onFertig }: { onFertig: () => void }) {
+  const [i, setI] = useState(0);
+  const k = KARTEN[i];
+  const letzte = i === KARTEN.length - 1;
+  const fertig = () => { setzen({ rundgang: true, neuGesehen: NEUSTE }); onFertig(); };
+  return (
+    <div className="wahl mitte">
+      <div className="wahl-box hilfe-box">
+        <div className="hilfe-icon" aria-hidden="true">{k.icon}</div>
+        <h3>{k.titel}</h3>
+        <p>{k.text}</p>
+        <p className="hilfe-punkte" aria-label={`Schritt ${i + 1} von ${KARTEN.length}`}>
+          {KARTEN.map((_, j) => <span key={j} className={j === i ? 'an' : ''} />)}
+        </p>
+        <div className="hilfe-knoepfe">
+          <button className="btn" onClick={fertig}>Überspringen</button>
+          <button className="btn an" onClick={() => (letzte ? fertig() : setI(i + 1))}>{letzte ? 'Los geht’s' : 'Weiter'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WasIstNeu({ liste, onFertig }: { liste: typeof NEUES; onFertig: () => void }) {
+  return (
+    <div className="wahl mitte">
+      <div className="wahl-box hilfe-box tipp-box">
+        <h3>Was ist neu?</h3>
+        {liste.map((n) => (
+          <div key={n.v}>
+            <h4>{n.titel}</h4>
+            <ul>{n.punkte.map((p, j) => <li key={j}>{p}</li>)}</ul>
+          </div>
+        ))}
+        <button className="btn an gross" style={{ width: '100%', marginTop: 10 }} onClick={() => { setzen({ neuGesehen: NEUSTE }); onFertig(); }}>
+          Alles klar
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Beim Start: Rundgang (wer neu ist) oder „Was ist neu?" (nach einem Update). */
+export function StartHilfe() {
+  const [s] = useState(stand);
+  const [zu, setZu] = useState(false);
+  if (zu) return null;
+  if (!s.rundgang) return <Rundgang onFertig={() => setZu(true)} />;
+  const liste = NEUES.filter((n) => !s.neuGesehen || neuer(n.v, s.neuGesehen));
+  if (!liste.length) return null;
+  return <WasIstNeu liste={liste} onFertig={() => setZu(true)} />;
+}
+
+// ---------------- Einmal-Hinweise ----------------
+export function einmalGesehen(name: string): boolean {
+  return (stand().einmal ?? []).includes(name);
+}
+export function einmalMerken(name: string) {
+  const e = stand().einmal ?? [];
+  if (!e.includes(name)) setzen({ einmal: [...e, name] });
+}
+
+/** Kurze Erklärung in einem Fenster mit „Alles klar". */
+export function Erklaerung({ titel, children, onZu }: { titel: string; children: ReactNode; onZu: () => void }) {
+  return (
+    <div className="wahl mitte" onClick={onZu}>
+      <div className="wahl-box hilfe-box tipp-box" onClick={(e) => e.stopPropagation()}>
+        <h3>{titel}</h3>
+        {children}
+        <button className="btn an gross" style={{ width: '100%', marginTop: 10 }} onClick={onZu}>Alles klar</button>
+      </div>
+    </div>
+  );
+}

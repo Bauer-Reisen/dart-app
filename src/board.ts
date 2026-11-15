@@ -85,7 +85,8 @@ export function hitLabelLang(h: Hit): string {
 }
 
 export function zielLabel(z: Ziel): string {
-  return z.ring === 'B' ? 'Bull' : z.ring + z.seg;
+  if (z.seg === 25) return z.ring === 'D' ? 'Bullseye' : 'Bull';
+  return z.ring + z.seg;
 }
 
 export function sameZiel(a: Ziel, b: Ziel): boolean {
@@ -121,7 +122,7 @@ export function hitPath(h: Hit): string | null {
 
 /** Umriss des Zielfeldes. */
 export function zielPath(z: Ziel): string {
-  if (z.ring === 'B') return circle(RADIUS.SB);
+  if (z.seg === 25) return z.ring === 'D' ? circle(RADIUS.DB) : circle(RADIUS.SB);
   const a = segAngle(z.seg);
   if (z.ring === 'T') return sector(RADIUS.SI, RADIUS.T, a - 9, a + 9);
   if (z.ring === 'D') return sector(RADIUS.SO, RADIUS.D, a - 9, a + 9);

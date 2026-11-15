@@ -90,6 +90,7 @@ export function AtcSpiel(p: SpielProps) {
   const nummerVon = (pos: number) => ATC_FOLGE[Math.min(pos, ATC_FOLGE.length - 1)];
 
   const e = useEingabe({
+    merken: { name: 'atc', id: match.id },
     zielFuer: (d) => atcZiel(v, nummerVon(mitDarts(d).pos[s])),
     fertigNach: (d) => d.length >= 3 || mitDarts(d).gewinner !== null,
     onFertig: (d) => {
@@ -164,6 +165,7 @@ export function BobsSpiel(p: SpielProps) {
   const w = bobWert(nummer);
 
   const e = useEingabe({
+    merken: { name: 'bobs', id: match.id },
     zielFuer: () => bobZiel(nummer),
     fertigNach: (d) => d.length >= 3,
     onFertig: (d) => {
@@ -257,6 +259,7 @@ export function DoppelSpiel(p: SpielProps) {
   const festZiel: Ziel = finish ? { seg: 20, ring: 'D' } : doppelZiel(o);
 
   const e = useEingabe({
+    merken: { name: 'doppel', id: match.id },
     zielFuer: (d) => {
       if (!finish) return festZiel;
       const a = auswerten(rest, hits(d), true);

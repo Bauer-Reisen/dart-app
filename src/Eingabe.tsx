@@ -1,5 +1,5 @@
 // Die Eingabe mit der Scheibe – derselbe Baustein für Training und alle Spiele.
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Scheibe } from './Scheibe';
 import { ZielWahl } from './ZielWahl';
 import { useTipp, type TippQuelle } from './TippFenster';
@@ -22,6 +22,19 @@ export interface EingabeOpts {
   /** Spiel: Ausweich-Ziele zum Vorschlag. */
   alternativen?: (vorschlag: Ziel, darts: Dart[]) => Ziel[];
   startChips?: Ziel[];
+  /** Angefangene Aufnahme (und im Training die Ziele) auf dem Gerät merken, z. B. beim Verlassen übers Menü.
+   *  name = Speicherplatz, id = laufendes Spiel (andere id → nichts übernehmen). */
+  merken?: { name: string; id?: string };
+}
+
+interface Gemerkt { id?: string; darts: Dart[]; ziel: Ziel | null; chips?: Ziel[] }
+
+function gemerktLaden(m: EingabeOpts['merken']): Gemerkt | null {
+  if (!m) return null;
+  try {
+    const g = JSON.parse(localStorage.getItem('dart-offen-' + m.name) ?? 'null') as Gemerkt | null;
+    return g && g.id === m.id && Array.isArray(g.darts) ? g : null;
+  } catch { return null; }
 }
 
 function rueckmeldung() {
@@ -33,15 +46,26 @@ export function summe(d: Dart[]) {
 }
 
 export function useEingabe(o: EingabeOpts) {
-  const [darts, setDarts] = useState<Dart[]>([]);
+  const [gemerkt] = useState(() => gemerktLaden(o.merken));
+  const [darts, setDarts] = useState<Dart[]>(gemerkt?.darts ?? []);
   const [zuletzt, setZuletzt] = useState<Dart[] | null>(null);
-  const [override, setOverride] = useState<Ziel | null>(null);
+  const [override, setOverride] = useState<Ziel | null>(o.zielBleibt ? gemerkt?.ziel ?? null : null);
   const [ersetzen, setErsetzen] = useState<number | null>(null);
   const [flash, setFlash] = useState<{ hit: Hit; key: number } | null>(null);
   const [zoom, setZoom] = useState(false);
   const [wahlOffen, setWahlOffen] = useState(false);
-  const [trainingChips, setTrainingChips] = useState<Ziel[]>(o.startChips ?? []);
+  const [trainingChips, setTrainingChips] = useState<Ziel[]>(gemerkt?.chips?.length ? gemerkt.chips : o.startChips ?? []);
   const timer = useRef<number | undefined>(undefined);
+
+  const merkName = o.merken?.name;
+  const merkId = o.merken?.id;
+  useEffect(() => {
+    if (!merkName) return;
+    try {
+      const g: Gemerkt = { id: merkId, darts, ziel: o.zielBleibt ? override : null, chips: o.zielBleibt ? trainingChips : undefined };
+      localStorage.setItem('dart-offen-' + merkName, JSON.stringify(g));
+    } catch { /* Speicher voll oder gesperrt */ }
+  }, [merkName, merkId, darts, override, trainingChips, o.zielBleibt]);
 
   const vorschlag = o.zielFuer(darts);
   const ziel = override ?? vorschlag;
@@ -197,7 +221,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
         <button
           className={'icon zoom' + (e.zoom ? ' an' : '')}
           onClick={() => e.setZoom(!e.zoom)}
-          disabled={e.ziel.ring === 'B'}
+          disabled={e.ziel.seg === 25}
           aria-label="Zoom auf das Ziel"
         >
           🔍
