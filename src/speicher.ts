@@ -5,6 +5,8 @@ export interface Dart {
   hit: Hit;
   ziel: Ziel;
   t: number; // Zeitpunkt des Tipps (ms)
+  /** Getippte Stelle auf einer echten Scheibe in mm (Mitte = 0/0, x rechts, y unten); fehlt bei Abpraller, „3× gleich“ und alten Daten. */
+  p?: [number, number];
   frei?: boolean; // Halve-It "beliebiges Doppel/Triple": Ziel nicht bekannt → nicht ins Trefferbild
 }
 

@@ -23,6 +23,7 @@ self.addEventListener('fetch', (ev) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return; // fremde Dienste nicht anfassen
+  if (url.pathname.endsWith('/version.json')) return; // Versionsprüfung immer direkt beim Server
 
   ev.respondWith((async () => {
     const cache = await caches.open(CACHE);

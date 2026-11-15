@@ -132,3 +132,27 @@ export function zielPath(z: Ziel): string {
 function circle(r: number): string {
   return `M${-r} 0 A${r} ${r} 0 1 0 ${r} 0 A${r} ${r} 0 1 0 ${-r} 0 Z`;
 }
+
+/** Echte Maße einer Steeldart-Scheibe (Außenradius je Ring in mm). */
+export const ECHT_MM = { DB: 6.35, SB: 15.9, SI: 99, T: 107, SO: 162, D: 170, MISS: 200 } as const;
+
+/**
+ * Getippte Stelle auf der (verzerrten) Bildschirm-Scheibe → Stelle auf einer echten Scheibe in mm.
+ * Der Winkel bleibt, der Abstand zur Mitte wird ringweise umgerechnet (Triple und Doppel sind auf dem Bildschirm dicker).
+ */
+export function echtePosition(x: number, y: number): [number, number] {
+  const r = Math.hypot(x, y);
+  if (r === 0) return [0, 0];
+  const stufen: [number, number][] = [
+    [0, 0], [RADIUS.DB, ECHT_MM.DB], [RADIUS.SB, ECHT_MM.SB], [RADIUS.SI, ECHT_MM.SI], [RADIUS.T, ECHT_MM.T],
+    [RADIUS.SO, ECHT_MM.SO], [RADIUS.D, ECHT_MM.D], [RADIUS.MISS, ECHT_MM.MISS],
+  ];
+  let echt = ECHT_MM.MISS + (r - RADIUS.MISS);
+  for (let i = 1; i < stufen.length; i++) {
+    const [r0, e0] = stufen[i - 1];
+    const [r1, e1] = stufen[i];
+    if (r <= r1) { echt = e0 + ((r - r0) / (r1 - r0)) * (e1 - e0); break; }
+  }
+  const f = echt / r;
+  return [Math.round(x * f * 10) / 10, Math.round(y * f * 10) / 10];
+}

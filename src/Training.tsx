@@ -17,7 +17,7 @@ const START_CHIPS: Ziel[] = [
 const SO_GEHTS = (
   <ul>
     <li><b>Oben</b> wählst du dein Ziel (gelb = aktuell). Mit <b>＋</b> holst du ein anderes dazu, z. B. D16 oder Bull.</li>
-    <li>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – <b>in der Reihenfolge, wie du geworfen hast</b> (Felder 1., 2., 3.). Nur so sieht die App, wie sicher dein 1., 2. und 3. Dart ist. Nach 3 Darts ist die Aufnahme gespeichert.</li>
+    <li>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – <b>in der Reihenfolge, wie du geworfen hast</b> (Felder 1., 2., 3.). Nur so sieht die App, wie sicher dein 1., 2. und 3. Dart ist. Tippe möglichst <b>genau an die Stelle</b>, wo er steckt – dann zeigt die Statistik auch, wie weit du im Schnitt neben der Zielmitte liegst. Nach 3 Darts ist die Aufnahme gespeichert.</li>
     <li>Die App merkt sich zu jedem Ziel, wie oft du triffst und <b>wohin du danebenwirfst</b>. Das siehst du in der <b>Statistik</b> unter „Trefferbild je Ziel".</li>
     <li>Ab {MIN_FEHL} Fehlwürfen auf ein Ziel erkennt die App ein Muster (z. B. „meist zu tief"). Dann <b>leuchtet die 💡</b> mit einem Tipp und einer passenden Übung.</li>
     <li>Im Reiter Training steht dann ein <b>Trainingsvorschlag</b>: {RUNDE} Aufnahmen auf dein Sorgen-Ziel mit einem Punkt, auf den du achtest – danach siehst du, ob es besser wird.</li>

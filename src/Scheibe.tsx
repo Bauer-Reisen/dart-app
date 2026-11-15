@@ -15,8 +15,9 @@ const FARBE = {
 interface Props {
   ziel: Ziel;
   zoom: boolean;
-  flash: { hit: Hit; key: number } | null;
-  onHit: (h: Hit) => void;
+  flash: { hit: Hit; key: number; punkt?: [number, number] } | null;
+  /** punkt = getippte Stelle in Bildschirm-Koordinaten der Scheibe */
+  onHit: (h: Hit, punkt: [number, number]) => void;
 }
 
 /**
@@ -74,7 +75,7 @@ export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
     const m = g.current?.getScreenCTM();
     if (!m) return;
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
-    onHit(hitAt(p.x, p.y));
+    onHit(hitAt(p.x, p.y), [p.x, p.y]);
   }
 
   const fp = flash ? hitPath(flash.hit) : null;
@@ -89,6 +90,7 @@ export function Scheibe({ ziel, zoom, flash, onHit }: Props) {
         <circle r={RADIUS.DB} fill={FARBE.rot} />
         <path d={zielPath(ziel)} className="zielrand" />
         {fp && <path key={flash!.key} d={fp} className="flash" fillRule="evenodd" />}
+        {flash?.punkt && <circle key={'p' + flash.key} cx={flash.punkt[0]} cy={flash.punkt[1]} r={4} className="tipp-punkt" />}
         {zahlen}
       </g>
     </svg>

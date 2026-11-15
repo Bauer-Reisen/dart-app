@@ -5,6 +5,8 @@ import { wurfbild, wurfbildTipps } from './tipps';
 import { WurfbildHinweis } from './TippFenster';
 import { aussage, klasse, nachbarn, type Klasse } from './klassen';
 import { dartfolge, MIN_N, quoteText } from './dartfolge';
+import { treffpunkt, treffpunktText } from './treffpunkt';
+import { TrefferBild } from './TrefferBild';
 import { alsDateiSichern, ausDateiLaden, ICH, type Aufnahme } from './speicher';
 import { ligaLaden, ligaSpeichern, type LigaDaten } from './liga';
 import { auswerten, average, istDoppel } from './x01';
@@ -366,6 +368,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH }: Props) {
               </ul>
             )}
             <DartfolgeZeilen f={dartfolge(meine, z.ziel)} />
+            <TreffpunktZeile darts={meineDarts} ziel={z.ziel} />
             {wurfbildTipps(wurfbild(meineDarts, z.ziel)).map((t) => <WurfbildHinweis key={t.richtung} t={t} />)}
           </div>
         );
@@ -409,6 +412,23 @@ function DartfolgeZeilen({ f }: { f: ReturnType<typeof dartfolge> }) {
         </tbody>
       </table>
       {satz && <p className="info klein">{satz}</p>}
+    </div>
+  );
+}
+
+
+/** Wo genau landen die Darts? Nur mit getippter Stelle (ab Version 0.6) und bei Triple, Doppel, Bull. */
+function TreffpunktZeile({ darts, ziel }: { darts: Parameters<typeof treffpunkt>[0]; ziel: Ziel }) {
+  const t = treffpunkt(darts, ziel);
+  if (!t) return null;
+  return (
+    <div className="trefferbild-box">
+      <TrefferBild darts={darts} ziel={ziel} t={t} />
+      <div>
+        <p className="info klein">{treffpunktText(t)}</p>
+        <p className="legende"><span className="g">●</span> Treffer · <span className="r">●</span> daneben · ✚ mittlerer Treffpunkt · ◌ halbe Darts</p>
+        <p className="legende">Ungefähr – so genau, wie du tippst.</p>
+      </div>
     </div>
   );
 }

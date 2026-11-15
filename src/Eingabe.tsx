@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Scheibe } from './Scheibe';
 import { ZielWahl } from './ZielWahl';
 import { useTipp, type TippQuelle } from './TippFenster';
-import { hitLabel, hitLabelLang, points, sameZiel, zielLabel, type Hit, type Ziel } from './board';
+import { echtePosition, hitLabel, hitLabelLang, points, sameZiel, zielLabel, type Hit, type Ziel } from './board';
 import type { Dart } from './speicher';
 
 const HINWEIS_MS = 2500;
@@ -51,7 +51,7 @@ export function useEingabe(o: EingabeOpts) {
   const [zuletzt, setZuletzt] = useState<Dart[] | null>(null);
   const [override, setOverride] = useState<Ziel | null>(o.zielBleibt ? gemerkt?.ziel ?? null : null);
   const [ersetzen, setErsetzen] = useState<number | null>(null);
-  const [flash, setFlash] = useState<{ hit: Hit; key: number } | null>(null);
+  const [flash, setFlash] = useState<{ hit: Hit; key: number; punkt?: [number, number] } | null>(null);
   const [zoom, setZoom] = useState(false);
   const [wahlOffen, setWahlOffen] = useState(false);
   const [trainingChips, setTrainingChips] = useState<Ziel[]>(gemerkt?.chips?.length ? gemerkt.chips : o.startChips ?? []);
@@ -100,17 +100,18 @@ export function useEingabe(o: EingabeOpts) {
     setDarts(liste);
   }
 
-  function treffer(hit: Hit) {
+  function treffer(hit: Hit, punkt?: [number, number]) {
     rueckmeldung();
-    setFlash({ hit, key: Date.now() });
+    setFlash({ hit, key: Date.now(), punkt });
     setZuletzt(null);
+    const p = punkt ? echtePosition(punkt[0], punkt[1]) : undefined;
     if (ersetzen !== null) {
-      const liste = darts.map((d, i) => (i === ersetzen ? { ...d, hit } : d));
+      const liste = darts.map((d, i) => (i === ersetzen ? { ...d, hit, p } : d));
       setErsetzen(null);
       pruefen(liste);
       return;
     }
-    const liste = [...darts, { hit, ziel, t: Date.now() }];
+    const liste: Dart[] = [...darts, { hit, ziel, t: Date.now(), ...(p ? { p } : {}) }];
     if (!o.zielBleibt) setOverride(null);
     pruefen(liste);
   }
@@ -124,7 +125,7 @@ export function useEingabe(o: EingabeOpts) {
     rueckmeldung();
     const letzter = darts[darts.length - 1];
     const liste = [...darts];
-    while (liste.length < 3) liste.push({ ...letzter, t: Date.now() });
+    while (liste.length < 3) liste.push({ hit: letzter.hit, ziel: letzter.ziel, t: Date.now() }); // ohne Stelle: nicht wirklich getippt
     pruefen(liste);
   }
 

@@ -466,3 +466,11 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .trainings-vorschlag .fokus { color: var(--akzent); }
 .fokus-leiste { background: var(--fl); padding: 6px 12px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
 .fokus-leiste b { color: var(--akzent); }
+
+/* Getippte Stelle und Trefferbild in der Statistik */
+.tipp-punkt { fill: #fff; stroke: #111; stroke-width: 1.5; pointer-events: none; animation: blink 1.2s ease-out forwards; }
+.trefferbild-box { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 12px; align-items: center; margin-top: 10px; }
+.trefferbild { width: 100%; aspect-ratio: 1; border-radius: 10px; }
+.trefferbild-box p { margin: 0; }
+.legende { font-size: 12px; color: var(--leise); margin-top: 4px; }
+.legende .g { color: #4cc26b; } .legende .r { color: #e0533f; }

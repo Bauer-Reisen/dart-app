@@ -17,6 +17,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; punkte: ReactNode[] }[] = [
   {
+    v: '0.6.0', titel: 'Genau tippen lohnt sich',
+    punkte: [
+      <>Die App merkt sich jetzt, <b>wo genau</b> du ins Feld tippst. Tippe den Dart möglichst an die Stelle, wo er steckt.</>,
+      <>In der <b>Statistik</b> siehst du bei Triple, Doppel und Bull ein kleines Bild mit allen Darts, deinem <b>mittleren Treffpunkt</b> und wie weit du streust – z. B. „im Schnitt 6 mm zu tief“.</>,
+      <>Neue Versionen kommen jetzt <b>von selbst</b>: Die App lädt kurz neu, sobald es ein Update gibt.</>,
+    ],
+  },
+  {
     v: '0.5.0', titel: 'Mehrere Spieler und geführtes Training',
     punkte: [
       <>Oben bei Training und Spiele: <b>Es wirft: …</b> – tippe drauf, um zu wählen, wer wirft, oder neue Spieler anzulegen. Jeder hat seine eigene Statistik. Mit ✎ machst du aus „Ich“ deinen Namen, die bisherigen Würfe gehen mit.</>,
@@ -55,7 +63,7 @@ const KARTEN: { icon: string; titel: string; text: ReactNode }[] = [
   },
   {
     icon: '👆', titel: 'Darts eintippen',
-    text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
+    text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – möglichst genau an die Stelle und der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
   },
   {
     icon: '🏋️', titel: 'Training',
