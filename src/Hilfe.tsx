@@ -22,6 +22,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.13.0', titel: 'iPad: Tabelle groß, Scheibe auf Knopfdruck',
+    rundgang: ['spiele'],
+    punkte: [
+      <>Auf dem <b>iPad quer</b> ist in den Spielen die <b>Tabelle groß</b>, solange keiner wirft – gut lesbar auch aus der Entfernung. Mit <b>🎯 Scheibe öffnen</b> wird die Scheibe groß; nach der Aufnahme kommt die Tabelle von selbst zurück. Mit <b>📋 Tabelle groß</b> kannst du jederzeit zurückschalten.</>,
+    ],
+  },
+  {
     v: '0.12.0', titel: '🏆 Bestenliste',
     rundgang: ['statistik'],
     punkte: [
@@ -157,8 +164,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Oben in Training, Spiele, Liga und Statistik steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik und seine eigene Liga.</>,
   },
   {
-    id: 'spiele', stand: '0.10.1', icon: '🎮', titel: 'Spiele',
-    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote.</>,
+    id: 'spiele', stand: '0.13.0', icon: '🎮', titel: 'Spiele',
+    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote. Auf dem <b>iPad quer</b> ist die Tabelle groß, solange keiner wirft – tippe auf <b>🎯 Scheibe öffnen</b>, um zu werfen.</>,
   },
   {
     id: 'liga', stand: '0.7.0', icon: '🏆', titel: 'Liga',

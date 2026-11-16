@@ -547,6 +547,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
       tipp={{ art: 'x01', darts: dartsVon(aufnahmen.filter((a) => !a.bot), match.spieler[botAmZug ? ich : s]), aufnahmen: aufnahmenVon(aufnahmen.filter((a) => !a.bot), match.spieler[botAmZug ? ich : s]) }}
       onMenu={onMenu}
       oben={oben}
+      wechsel
       snackText={snack}
       overlay={overlay}
       kopfInfo={

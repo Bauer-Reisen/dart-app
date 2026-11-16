@@ -531,3 +531,36 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 }
 @media (min-width: 700px) and (orientation: portrait) { .zurueck { width: 60px; height: 60px; font-size: 30px; } }
 @media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) { .zurueck { width: 60px; height: 60px; font-size: 30px; top: 12px; } }
+
+/* iPad quer: Wechsel Scheibe groß ↔ Tabelle groß */
+.wechsel-knopf, .scheibe-oeffnen { display: none; }
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
+  .wechsel-knopf {
+    display: block; position: absolute; top: 12px; right: 0; z-index: 3;
+    height: 60px; padding: 0 16px; border-radius: 12px; border: 1px solid #333;
+    background: var(--fl); color: var(--text); font-size: 18px; font-weight: 700;
+  }
+  .scheibe-oeffnen {
+    display: flex; position: absolute; inset: 0; z-index: 4; align-items: flex-end; justify-content: center;
+    background: transparent; border: 0; padding-bottom: 24px;
+  }
+  .scheibe-oeffnen span {
+    background: var(--akzent); color: #111; font-weight: 800; font-size: 22px;
+    padding: 16px 22px; border-radius: 14px; box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  }
+  .app.tafel-gross { grid-template-columns: minmax(260px, 30%) 1fr; }
+  .app.tafel-gross .sp-name { font-size: 30px; }
+  .app.tafel-gross .sp-rest, .app.tafel-gross .tafel.n1 .sp-rest { font-size: 110px; }
+  .app.tafel-gross .sp-av { font-size: 24px; }
+  .app.tafel-gross .spieler { padding: 14px 18px; }
+  .app.tafel-gross .kopf-info strong { font-size: 52px; }
+  .app.tafel-gross .ctafel.gedreht td { height: 80px; font-size: 50px; }
+  .app.tafel-gross .ctafel.gedreht th.cname { font-size: 30px !important; }
+  .app.tafel-gross .ctafel.gedreht th.cnr { font-size: 34px; }
+  .app.tafel-gross .ctafel.gedreht .cpkt { font-size: 38px !important; }
+  .app.tafel-gross .ctafel.htafel td { height: 52px; font-size: 30px; }
+  .app.tafel-gross .ctafel.htafel td.hwert { font-size: 20px; }
+  .app.tafel-gross .ctafel th { font-size: 24px; }
+  .app.tafel-gross .cname { font-size: 26px !important; }
+  .app.tafel-gross .doppel-frage { font-size: 22px; }
+}

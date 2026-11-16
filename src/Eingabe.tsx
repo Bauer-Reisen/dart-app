@@ -186,13 +186,39 @@ interface ViewProps {
   overlay?: ReactNode;
   /** 💡-Knopf: Tipps zur Übung und zum eigenen Wurfbild. */
   tipp?: TippQuelle;
+  /** iPad quer: Tabelle groß / Scheibe klein im Wechsel (Spiele mit Tafel). */
+  wechsel?: boolean;
 }
 
-export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp }: ViewProps) {
+const IPAD_QUER = '(orientation: landscape) and (min-width: 900px) and (min-height: 600px)';
+
+function useIpadQuer(): boolean {
+  const [an, setAn] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(IPAD_QUER).matches);
+  useEffect(() => {
+    const m = window.matchMedia?.(IPAD_QUER);
+    if (!m) return;
+    const neu = () => setAn(m.matches);
+    m.addEventListener('change', neu);
+    return () => m.removeEventListener('change', neu);
+  }, []);
+  return an;
+}
+
+export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp, wechsel }: ViewProps) {
   const sichtbar = e.darts.length ? e.darts : e.zuletzt ?? [];
   const t = useTipp(tipp, e.ziel);
+
+  // iPad quer: Solange keiner wirft, ist die Tabelle groß (auch nach jeder Aufnahme und beim Start).
+  // „🎯 Scheibe öffnen“ macht die Scheibe groß, „📋 Tabelle groß“ schaltet zurück.
+  const ipad = useIpadQuer();
+  const aktiv = !!wechsel && !!oben && ipad;
+  const [tafelGross, setTafelGross] = useState(() => e.darts.length === 0);
+  useEffect(() => { if (e.zuletzt && !e.darts.length) setTafelGross(true); }, [e.zuletzt, e.darts.length]);
+  useEffect(() => { if (e.darts.length) setTafelGross(false); }, [e.darts.length]);
+  const gross = aktiv && tafelGross;
+
   return (
-    <div className="app">
+    <div className={'app' + (gross ? ' tafel-gross' : '')}>
       {oben && <div className="oben">{oben}</div>}
       <header className="kopf">
         <div className="kopf-info">{kopfInfo}</div>
@@ -236,6 +262,12 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
       <main className="flaeche">
         {/* Zurück: links oben neben der Scheibe, nicht bei Zahlen oder Tabelle */}
         <button className="zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>
+        {aktiv && !gross && <button className="wechsel-knopf" onClick={() => setTafelGross(true)}>📋 Tabelle groß</button>}
+        {gross && (
+          <button className="scheibe-oeffnen" onClick={() => setTafelGross(false)} aria-label="Scheibe groß zeigen">
+            <span>🎯 Scheibe öffnen</span>
+          </button>
+        )}
         <Scheibe ziel={e.ziel} flash={e.flash} onHit={e.treffer} />
         {e.flash && <div key={e.flash.key} className="ansage">{hitLabelLang(e.flash.hit)}</div>}
         {e.ersetzen !== null && <div className="hinweis-oben">Tippe das richtige Feld für Dart {e.ersetzen + 1}</div>}

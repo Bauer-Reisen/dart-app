@@ -165,6 +165,7 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
       tipp={{ art: 'cricket', darts: dartsVon(aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(aufnahmen, match.spieler[s]) }}
       onMenu={onMenu}
       oben={oben}
+      wechsel
       snackText={snack}
       overlay={overlay || undefined}
       kopfInfo={

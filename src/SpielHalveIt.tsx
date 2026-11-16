@@ -136,6 +136,7 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
       tipp={{ art: 'halveit', darts: dartsVon(aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(aufnahmen, match.spieler[s]) }}
       onMenu={onMenu}
       oben={oben}
+      wechsel
       snackText={snack}
       overlay={overlay || undefined}
       kopfInfo={
