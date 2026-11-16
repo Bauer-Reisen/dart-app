@@ -1,5 +1,5 @@
 // Speichert alles nur auf diesem Gerät. (Prototyp: localStorage; später IndexedDB.)
-import type { Hit, Ziel } from './board';
+import { points, type Hit, type Ziel } from './board';
 
 export interface Dart {
   hit: Hit;
@@ -48,12 +48,38 @@ interface Datei {
 
 const KEY = 'dart-training-v1';
 
+/**
+ * Nur Darts mit bekanntem Ziel zählen für Trefferquoten, Trefferbild und Tipps.
+ * Cricket: nie – man weiß nicht, ob jemand zumacht oder dem Gegner Punkte gibt.
+ * 501/301: nur der Dart aufs Doppel zum Ausmachen (beim Punkten weiß man nicht, ob T20 oder T19).
+ * Neue Würfe werden schon beim Eintippen so markiert; das hier bereinigt ältere Daten (vor 0.8.0) und geladene Dateien.
+ */
+export function zielBereinigen(a: Aufnahme): Aufnahme {
+  if (a.modus === 'cricket') {
+    return a.darts.every((d) => d.frei) ? a : { ...a, darts: a.darts.map((d) => ({ ...d, frei: true })) };
+  }
+  if (a.modus === 'x01') {
+    let r = a.restVorher ?? 0;
+    let neu = false;
+    const darts = a.darts.map((d) => {
+      const ziel = d.ziel.seg === 25 ? 50 : d.ziel.ring === 'D' ? d.ziel.seg * 2 : -1;
+      const bekannt = (a.doubleOut ?? true) && ziel === r;
+      r -= points(d.hit);
+      if (bekannt || d.frei) return d;
+      neu = true;
+      return { ...d, frei: true };
+    });
+    return neu ? { ...a, darts } : a;
+  }
+  return a;
+}
+
 export function laden(): Aufnahme[] {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return [];
     const d = JSON.parse(raw) as Datei;
-    return Array.isArray(d.aufnahmen) ? d.aufnahmen : [];
+    return Array.isArray(d.aufnahmen) ? d.aufnahmen.map(zielBereinigen) : [];
   } catch {
     return [];
   }
@@ -84,7 +110,7 @@ export function alsDateiSichern(aufnahmen: Aufnahme[], liga?: unknown): void {
 export async function ausDateiLaden(file: File): Promise<{ aufnahmen: Aufnahme[]; liga?: unknown }> {
   const d = JSON.parse(await file.text()) as Datei;
   if (d.schemaVersion !== 1 || !Array.isArray(d.aufnahmen)) throw new Error('Unbekannte Datei');
-  return { aufnahmen: d.aufnahmen, liga: d.liga };
+  return { aufnahmen: d.aufnahmen.map(zielBereinigen), liga: d.liga };
 }
 
 // ---------- laufende Spiele (je Spielart eins, damit es nach Neuladen weitergeht) ----------

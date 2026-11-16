@@ -358,6 +358,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
         </div>
       )}
       {zeilen.length > 0 && <h3>Trefferbild je Ziel</h3>}
+      {zeilen.length > 0 && <p className="info klein">Hier zählen nur Würfe, bei denen die App weiß, wohin du zielst: Training, Übungen, feste Halve-It-Runden und bei 501 der Dart aufs Doppel zum Ausmachen. Cricket und Punkte-Darts bei 501 zählen nicht – da weiß man nie, worauf jemand gerade geht.</p>}
 
       {zeilen.map((z) => {
         const n = z.ziel.seg === 25 ? null : nachbarn(z.ziel.seg);

@@ -9,7 +9,7 @@ import { Liga } from './LigaSeite';
 import { CricketSpiel } from './SpielCricket';
 import { HalveItSpiel } from './SpielHalveIt';
 import { AtcSpiel, BobsSpiel, DoppelSpiel } from './SpielUebungen';
-import { ICH, laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match, type SpielArt } from './speicher';
+import { ICH, laden, zielBereinigen, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match, type SpielArt } from './speicher';
 import { alleSpieler, matchUmbenennen, spielerLaden, spielerSpeichern, umbenennen, type SpielerStand } from './spieler';
 import { SpielerFenster } from './SpielerWahl';
 import { fuehrungLaden, fuehrungSpeichern, type Fuehrung } from './fuehrung';
@@ -94,7 +94,7 @@ export function App() {
 
   function hinzufuegen(a: Aufnahme) {
     setAufnahmen((alt) => {
-      const neu = [...alt, a];
+      const neu = [...alt, zielBereinigen(a)];
       speichern(neu);
       return neu;
     });
