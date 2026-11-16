@@ -22,6 +22,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.11.0', titel: 'Mehr aus deinen 501-Spielen',
+    rundgang: ['statistik'],
+    punkte: [
+      <>In der <b>Statistik</b> bei 501 neu: <b>Average der ersten 9 Darts</b>, wie oft eine Aufnahme beim Punkten <b>unter 40</b> bleibt, deine <b>Checkout-Quote</b> nach Rest (2–40, 41–100, 101–170) und welche <b>Doppel</b> du im Spiel triffst – mit Hinweis, wenn eines deutlich besser oder schlechter läuft.</>,
+      <>Cricket zählt nicht mehr in Trefferquoten und Tipps – da weiß die App nie, wohin du gerade zielst.</>,
+    ],
+  },
+  {
     v: '0.10.1', titel: 'Darts aufs Doppel',
     rundgang: ['spiele'],
     punkte: [
@@ -150,8 +158,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Spielst du in einer Liga? Verbinde die App mit deiner Liga (Bayerischer Dart-Verband) oder trag Spieltage selbst ein. Dann bekommst du einen Plan bis zum nächsten Spieltag.</>,
   },
   {
-    id: 'statistik', stand: '0.10.0', icon: '📊', titel: 'Statistik und 💡',
-    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Darunter steht, <b>was dem Trainer auffällt</b>: ob deine Darts eng oder gestreut liegen, welche Doppel zu dir passen, wie dein 3. Dart ist – jeweils mit Grund und was du probieren kannst. Leuchtet die <b>💡</b>, gibt es einen neuen Hinweis.</>,
+    id: 'statistik', stand: '0.11.0', icon: '📊', titel: 'Statistik und 💡',
+    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote, Checkout-Quote, deine Doppel im Spiel und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Darunter steht, <b>was dem Trainer auffällt</b>: ob deine Darts eng oder gestreut liegen, welche Doppel zu dir passen, wie dein 3. Dart ist – jeweils mit Grund und was du probieren kannst. Leuchtet die <b>💡</b>, gibt es einen neuen Hinweis.</>,
   },
   {
     id: 'daten', stand: '0.3.0', icon: '💾', titel: 'Deine Daten',

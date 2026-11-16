@@ -13,6 +13,7 @@ import { ligaAlle, ligaAlleSetzen, type LigaDaten } from './liga';
 import { SpielerLeiste } from './SpielerWahl';
 import { auswerten, average } from './x01';
 import { doppelWerte } from './doppel';
+import { MIN_CHANCEN, MIN_DOPPEL, MIN_PUNKTE_AUFN, x01Analyse } from './x01analyse';
 
 interface Props {
   aufnahmen: Aufnahme[];
@@ -200,6 +201,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
 
   const x01 = meine.filter((a) => a.modus === 'x01');
   const xw = x01.length ? x01Werte(x01) : null;
+  const xa = x01.length ? x01Analyse(x01) : null;
 
   const cr = meine.filter((a) => a.modus === 'cricket');
   const crSpiele = new Set(cr.map((a) => a.legId)).size;
@@ -276,6 +278,37 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
             </tbody>
           </table>
           {xw.dVers > 0 && xw.dVers < 20 && <p className="info klein">Doppelquote: erst ab etwa 20 Darts aufs Doppel aussagekräftig.</p>}
+          {xa && (
+            <>
+              <h4>Genauer hingeschaut</h4>
+              <table>
+                <tbody>
+                  <tr><td>Average erste 9 Darts</td><td>{xa.erste9 !== null ? xa.erste9.toFixed(1) : `– (ab 3 Legs, bisher ${xa.legs9})`}</td></tr>
+                  <tr><td>Aufnahmen unter 40 beim Punkten</td><td>{xa.punkteAufnahmen >= MIN_PUNKTE_AUFN ? `${Math.round((xa.schwach / xa.punkteAufnahmen) * 100)} % (${xa.schwach}/${xa.punkteAufnahmen})` : '–'}</td></tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>
+                  <tr><td>Ausgemacht von</td><td>Chancen</td><td>Quote</td></tr>
+                  {xa.checkout.map((b) => (
+                    <tr key={b.name}><td>{b.name}</td><td>{b.treffer}/{b.chancen}</td><td>{b.chancen >= MIN_CHANCEN ? `${Math.round((b.treffer / b.chancen) * 100)} %` : '–'}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+              {xa.doppel.length > 0 && (
+                <table>
+                  <tbody>
+                    <tr><td>Doppel im Spiel</td><td>Treffer</td><td>Quote</td></tr>
+                    {xa.doppel.slice(0, 6).map((z) => (
+                      <tr key={z.name}><td>{z.name}</td><td>{z.treff}/{z.vers}</td><td>{z.vers >= MIN_DOPPEL ? `${Math.round((z.treff / z.vers) * 100)} %` : '–'}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {xa.hinweise.map((h) => <div key={h} className="hinweis">{h}</div>)}
+              <p className="info klein">Erste 9 Darts = wie stark du punktest, bevor es ums Ausmachen geht. „Chancen“ = Aufnahmen, in denen du mit 3 Darts hättest ausmachen können. Doppel im Spiel = nur der Dart aufs Doppel, mit dem du gerade hättest ausmachen können.</p>
+            </>
+          )}
         </div>
       )}
 
