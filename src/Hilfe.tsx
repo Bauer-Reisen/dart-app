@@ -22,6 +22,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.14.0', titel: 'Im Spiel: nur der Spielstand',
+    rundgang: ['spiele'],
+    punkte: [
+      <>In allen Spielen und auf allen Geräten zeigt der Bildschirm jetzt nur den <b>Spielstand</b> – groß und gut lesbar.</>,
+      <>Zum Werfen oben rechts auf <b>🎯</b> tippen: Die Scheibe wird so groß wie möglich. Nach der Aufnahme kommt der Spielstand von selbst zurück, mit <b>📋</b> auch vorher.</>,
+    ],
+  },
+  {
     v: '0.13.0', titel: 'iPad: Tabelle groß, Scheibe auf Knopfdruck',
     rundgang: ['spiele'],
     punkte: [
@@ -164,8 +172,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Oben in Training, Spiele, Liga und Statistik steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik und seine eigene Liga.</>,
   },
   {
-    id: 'spiele', stand: '0.13.0', icon: '🎮', titel: 'Spiele',
-    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote. Auf dem <b>iPad quer</b> ist die Tabelle groß, solange keiner wirft – tippe auf <b>🎯 Scheibe öffnen</b>, um zu werfen.</>,
+    id: 'spiele', stand: '0.14.0', icon: '🎮', titel: 'Spiele',
+    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote. Im Spiel siehst du nur den <b>Spielstand</b> – zum Werfen oben rechts auf <b>🎯</b> tippen, dann ist die Scheibe groß.</>,
   },
   {
     id: 'liga', stand: '0.7.0', icon: '🏆', titel: 'Liga',
