@@ -1,6 +1,6 @@
 // 501 / 301: Einstellungen und Spielbildschirm.
 import { useEffect, useRef, useState } from 'react';
-import { ansageLaden, ansageMoeglich, ansageSpeichern, entsperren, punkteText, requireText, sprich, type AnsageArt } from './ansage';
+import { ansageLaden, ansageMoeglich, ansageSpeichern, entsperren, punkteText, requireText, sprich, stimmeLaden, stimmen, stimmeSpeichern, type AnsageArt } from './ansage';
 import type { Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
 import { EingabeView, useEingabe } from './Eingabe';
@@ -66,7 +66,24 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
     setAnsage(a);
     ansageSpeichern(a);
     sprich([a === 'en' ? 'One hundred and eighty!' : 'Hundertachtzig!'], a); // Probe – gleichzeitig Freigabe auf iPhone/iPad
+    setStimmeWahl(stimmeLaden(a));
   }
+  // Stimmen kommen auf manchen Geräten erst nach einem Moment
+  const [, setStimmenDa] = useState(0);
+  useEffect(() => {
+    if (!ansageMoeglich()) return;
+    const neu = () => setStimmenDa((n) => n + 1);
+    window.speechSynthesis.addEventListener('voiceschanged', neu);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', neu);
+  }, []);
+  const [stimmeWahl, setStimmeWahl] = useState(() => stimmeLaden(ansageLaden()));
+  function stimmeWaehlen(uri: string) {
+    setStimmeWahl(uri);
+    stimmeSpeichern(ansage, uri);
+    window.speechSynthesis.cancel();
+    sprich([ansage === 'en' ? 'Alex, you require 32' : 'Alex, du brauchst 32'], ansage);
+  }
+  const stimmListe = stimmen(ansage);
   const mitComputer = art === 'x01' && extra.computer;
   const maxSpieler = mitComputer ? 3 : 4;
 
@@ -209,6 +226,13 @@ export function SpielNeu({ art, onStart, onAbbruch, ich = ICH, bekannte = [] }: 
           ))}
         </div>
         {ansage !== 'aus' && <p className="info klein">Nach jeder Aufnahme sagt die App die Punkte an, im Finish-Bereich zum Beispiel „Alex, you require 32“. Ton am Gerät lauter stellen.</p>}
+        {ansage !== 'aus' && stimmListe.length > 1 && <label className="stimmwahl">Stimme
+          <select value={stimmeWahl} onChange={(e) => stimmeWaehlen(e.target.value)}>
+            <option value="">Automatisch (beste)</option>
+            {stimmListe.map((v) => <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>)}
+          </select>
+        </label>}
+        {ansage !== 'aus' && <p className="info klein">Klingt die Stimme blechern? Auf dem iPad unter Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → {ansage === 'en' ? 'Englisch' : 'Deutsch'} eine Stimme mit „Premium“ oder „Erweitert“ laden (z. B. {ansage === 'en' ? 'Daniel' : 'Anna'}). Die App nimmt sie dann von selbst.</p>}
       </>}
 
       <h3>Computer-Gegner</h3>

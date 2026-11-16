@@ -497,3 +497,5 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
   .ctafel.gedreht th.cnr { font-size: 22px; }
   .ctafel.gedreht .cpkt { font-size: 24px !important; }
 }
+.stimmwahl { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; font-weight: 600; }
+.stimmwahl select { flex: 1; min-height: 44px; font-size: 16px; padding: 0 10px; border-radius: 10px; background: var(--fl); color: inherit; border: 1px solid #555; }

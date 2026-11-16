@@ -39,19 +39,64 @@ export function requireText(name: string, rest: number, doubleOut: boolean, art:
   return art === 'en' ? `${name}, you require ${rest}` : `${name}, du brauchst ${rest}`;
 }
 
-function stimme(lang: string): SpeechSynthesisVoice | undefined {
-  const alle = window.speechSynthesis.getVoices();
-  return alle.find((v) => v.lang.replace('_', '-').toLowerCase() === lang.toLowerCase())
-    ?? alle.find((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2)));
+// Apple liefert Spaß- und Effektstimmen mit (Echo, Orgel, Roboter …) – die nie automatisch nehmen.
+const SPASS = ['albert', 'bad news', 'bahh', 'bells', 'boing', 'bubbles', 'cellos', 'deranged', 'good news', 'hysterical',
+  'jester', 'organ', 'pipe organ', 'superstar', 'trinoids', 'whisper', 'wobble', 'zarvox', 'junior', 'ralph', 'kathy', 'fred', 'princess', 'echo'];
+// Ältere, eher blecherne Apple-Stimmen (Eloquence) – nur, wenn nichts anderes da ist
+const BLECH = ['eddy', 'flo', 'grandma', 'grandpa', 'reed', 'rocko', 'sandy', 'shelley'];
+// Natürlich klingende Stimmen
+const GUT = ['daniel', 'arthur', 'malcolm', 'serena', 'kate', 'oliver', 'martha', 'stephanie', 'jamie',
+  'anna', 'helena', 'martin', 'petra', 'markus', 'yannick', 'viktor', 'google', 'microsoft', 'natural', 'neural', 'katja', 'conrad'];
+
+const sprache = (art: AnsageArt) => (art === 'en' ? 'en-GB' : 'de-DE');
+
+/** Punkte für eine Stimme: höher = natürlicher. */
+export function stimmWert(v: { name: string; lang: string; voiceURI: string }, lang: string): number {
+  const name = v.name.toLowerCase();
+  const vn = name.replace(/\s*\(.*$/, '').trim();
+  const uri = v.voiceURI.toLowerCase();
+  const l = v.lang.replace('_', '-').toLowerCase();
+  if (!l.startsWith(lang.slice(0, 2).toLowerCase())) return -100;
+  if (SPASS.includes(vn) || /novelty/.test(uri)) return -50;
+  let w = 0;
+  if (l === lang.toLowerCase()) w += 2;
+  if (/premium|enhanced|erweitert|verbessert|natural|neural/.test(name + ' ' + uri)) w += 6;
+  if (GUT.some((g) => name.includes(g))) w += 3;
+  if (BLECH.includes(vn) || /eloquence/.test(uri)) w -= 5;
+  return w;
+}
+
+/** Alle brauchbaren Stimmen dieser Sprache, beste zuerst. */
+export function stimmen(art: AnsageArt): SpeechSynthesisVoice[] {
+  if (!ansageMoeglich() || art === 'aus') return [];
+  const lang = sprache(art);
+  return window.speechSynthesis.getVoices()
+    .map((v) => ({ v, w: stimmWert(v, lang) }))
+    .filter((x) => x.w > -50)
+    .sort((x, y) => y.w - x.w || x.v.name.localeCompare(y.v.name))
+    .map((x) => x.v);
+}
+
+const STIMM_KEY = (art: AnsageArt) => `dart-ansage-stimme-${art}`;
+export function stimmeLaden(art: AnsageArt): string {
+  try { return localStorage.getItem(STIMM_KEY(art)) || ''; } catch { return ''; }
+}
+export function stimmeSpeichern(art: AnsageArt, uri: string) {
+  try { if (uri) localStorage.setItem(STIMM_KEY(art), uri); else localStorage.removeItem(STIMM_KEY(art)); } catch { /* egal */ }
+}
+
+function stimme(art: AnsageArt): SpeechSynthesisVoice | undefined {
+  const liste = stimmen(art);
+  const gewaehlt = stimmeLaden(art);
+  return (gewaehlt && liste.find((v) => v.voiceURI === gewaehlt)) || liste[0];
 }
 
 export function sprich(texte: string[], art: AnsageArt) {
   if (art === 'aus' || !ansageMoeglich()) return;
-  const lang = art === 'en' ? 'en-GB' : 'de-DE';
+  const v = stimme(art);
   for (const t of texte) {
     const u = new SpeechSynthesisUtterance(t);
-    u.lang = lang;
-    const v = stimme(lang);
+    u.lang = v?.lang || sprache(art);
     if (v) u.voice = v;
     u.rate = 0.95;
     window.speechSynthesis.speak(u);

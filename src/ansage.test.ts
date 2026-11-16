@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { punkteText, requireText } from './ansage';
+import { punkteText, requireText, stimmWert } from './ansage';
 
 describe('Ansage', () => {
   it('sagt Punkte, 180, No score und Game shot', () => {
@@ -17,5 +17,17 @@ describe('Ansage', () => {
     expect(requireText('Alex', 169, true, 'en')).toBeNull(); // mit 3 Darts nicht auszumachen
     expect(requireText('Alex', 1, true, 'en')).toBeNull();
     expect(requireText('Alex', 40, true, 'de')).toBe('Alex, du brauchst 40');
+  });
+});
+
+describe('Stimmenwahl', () => {
+  const v = (name: string, lang: string, voiceURI = 'x') => ({ name, lang, voiceURI });
+  it('nimmt nie Spaß- oder Echostimmen, bevorzugt Premium', () => {
+    const l = 'en-GB';
+    expect(stimmWert(v('Trinoids', 'en-US'), l)).toBeLessThan(-40);
+    expect(stimmWert(v('Cellos', 'en-US'), l)).toBeLessThan(-40);
+    expect(stimmWert(v('Grandpa (English (UK))', 'en-GB'), l)).toBeLessThan(stimmWert(v('Daniel', 'en-GB'), l));
+    expect(stimmWert(v('Daniel (Premium)', 'en-GB'), l)).toBeGreaterThan(stimmWert(v('Daniel', 'en-GB'), l));
+    expect(stimmWert(v('Anna', 'de-DE'), l)).toBe(-100);
   });
 });
