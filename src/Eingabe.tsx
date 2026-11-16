@@ -195,7 +195,6 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
     <div className="app">
       {oben && <div className="oben">{oben}</div>}
       <header className="kopf">
-        <button className="icon" onClick={onMenu} aria-label="Menü">☰</button>
         <div className="kopf-info">{kopfInfo}</div>
         {e.zielAnzeige === 'fest' && (
           <div className="chips">
@@ -235,6 +234,8 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
       </div>
 
       <main className="flaeche">
+        {/* Zurück: links oben neben der Scheibe, nicht bei Zahlen oder Tabelle */}
+        <button className="zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>
         <Scheibe ziel={e.ziel} flash={e.flash} onHit={e.treffer} />
         {e.flash && <div key={e.flash.key} className="ansage">{hitLabelLang(e.flash.hit)}</div>}
         {e.ersetzen !== null && <div className="hinweis-oben">Tippe das richtige Feld für Dart {e.ersetzen + 1}</div>}

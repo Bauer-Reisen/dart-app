@@ -522,3 +522,12 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .bestenliste .datum { text-align: right; color: var(--leise); font-size: 13px; white-space: nowrap; }
 .bestenliste tr.ich td { color: var(--akzent); }
 .stats-umschalter { margin-bottom: 14px; }
+/* Zurückpfeil in Spielen und Übungen: links oben in der Scheiben-Fläche */
+.flaeche { position: relative; }
+.zurueck {
+  position: absolute; top: 6px; left: 0; z-index: 3;
+  width: 48px; height: 48px; border-radius: 12px; border: 1px solid #333;
+  background: var(--fl); color: var(--text); font-size: 26px; line-height: 1;
+}
+@media (min-width: 700px) and (orientation: portrait) { .zurueck { width: 60px; height: 60px; font-size: 30px; } }
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) { .zurueck { width: 60px; height: 60px; font-size: 30px; top: 12px; } }

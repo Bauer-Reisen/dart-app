@@ -123,7 +123,7 @@ export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; 
     rundgang: 'klein',
     punkte: [
       <>Beim <b>＋</b> gibt es jetzt <b>Bull</b> (unter Single: 25 und 50 zählen) und <b>Bullseye</b> (unter Doppel: nur 50 zählt).</>,
-      <>Gehst du mitten in einer Aufnahme übers <b>☰ Menü</b> raus, sind die getippten Darts beim Zurückkommen noch da.</>,
+      <>Gehst du mitten in einer Aufnahme über den <b>← Zurückpfeil</b> raus, sind die getippten Darts beim Zurückkommen noch da.</>,
     ],
   },
 ];
