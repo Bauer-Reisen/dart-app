@@ -22,6 +22,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.12.0', titel: '🏆 Bestenliste',
+    rundgang: ['statistik'],
+    punkte: [
+      <>In der <b>Statistik</b> oben auf <b>🏆 Bestenliste</b> tippen: die <b>Top 10</b> aller Spieler auf diesem Gerät – bei 501 und 301 bester Average (je Leg) und beste Doppelquote (je Spieltag), bei Cricket die wenigsten Darts, bei Halve-It die höchste Punktzahl. Mit Name und Datum.</>,
+    ],
+  },
+  {
     v: '0.11.0', titel: 'Mehr aus deinen 501-Spielen',
     rundgang: ['statistik'],
     punkte: [
@@ -158,8 +165,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Spielst du in einer Liga? Verbinde die App mit deiner Liga (Bayerischer Dart-Verband) oder trag Spieltage selbst ein. Dann bekommst du einen Plan bis zum nächsten Spieltag.</>,
   },
   {
-    id: 'statistik', stand: '0.11.0', icon: '📊', titel: 'Statistik und 💡',
-    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote, Checkout-Quote, deine Doppel im Spiel und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Darunter steht, <b>was dem Trainer auffällt</b>: ob deine Darts eng oder gestreut liegen, welche Doppel zu dir passen, wie dein 3. Dart ist – jeweils mit Grund und was du probieren kannst. Leuchtet die <b>💡</b>, gibt es einen neuen Hinweis.</>,
+    id: 'statistik', stand: '0.12.0', icon: '📊', titel: 'Statistik und 💡',
+    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote, Checkout-Quote, deine Doppel im Spiel und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Darunter steht, <b>was dem Trainer auffällt</b>: ob deine Darts eng oder gestreut liegen, welche Doppel zu dir passen, wie dein 3. Dart ist – jeweils mit Grund und was du probieren kannst. Leuchtet die <b>💡</b>, gibt es einen neuen Hinweis. Oben unter <b>🏆 Bestenliste</b> stehen die Top 10 aller Spieler für 501, 301, Cricket und Halve-It.</>,
   },
   {
     id: 'daten', stand: '0.3.0', icon: '💾', titel: 'Deine Daten',

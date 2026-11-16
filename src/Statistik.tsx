@@ -3,6 +3,7 @@ import { gruppenLegs, nachBereich, type Bereich } from './gruppe';
 import { points, zielLabel, type Ziel } from './board';
 import { RUNDEN, rundenName } from './halveit';
 import { TrainerHinweis } from './TippFenster';
+import { BestenlisteAnsicht } from './BestenlisteAnsicht';
 import { allgemeineTipps, zielTipps } from './coach';
 import { aussage, klasse, nachbarn, type Klasse } from './klassen';
 import { dartfolge, MIN_N, quoteText } from './dartfolge';
@@ -178,6 +179,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
   // Allein / in der Gruppe: Auswahl nur zeigen, wenn es beides gibt
   const legs = gruppenLegs(aufnahmen);
   const [bereich, setBereich] = useState<Bereich>('alle');
+  const [bestenliste, setBestenliste] = useState(false);
   const nGruppe = nachBereich(alleMeine, 'gruppe', legs).length;
   const beides = nGruppe > 0 && nGruppe < alleMeine.length;
   const meine = beides ? nachBereich(alleMeine, bereich, legs) : alleMeine;
@@ -240,9 +242,26 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
     }
   }
 
+  const umschalter = (
+    <div className="ringwahl stats-umschalter">
+      <button className={'btn' + (!bestenliste ? ' an' : '')} onClick={() => setBestenliste(false)}>Meine Zahlen</button>
+      <button className={'btn' + (bestenliste ? ' an' : '')} onClick={() => setBestenliste(true)}>🏆 Bestenliste</button>
+    </div>
+  );
+  if (bestenliste) {
+    return (
+      <div className="seite stats">
+        <h1>Statistik</h1>
+        {umschalter}
+        <BestenlisteAnsicht aufnahmen={aufnahmen} ich={ich} />
+      </div>
+    );
+  }
+
   return (
     <div className="seite stats">
       <h1>Statistik</h1>
+      {umschalter}
 
       {onSpieler && <SpielerLeiste aktiv={ich} onOeffnen={onSpieler} />}
 
