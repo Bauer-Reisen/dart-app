@@ -9,7 +9,7 @@ import { simulationMerken } from './liga';
 import { hitLabel } from './board';
 import { zufallsReste } from './uebungen';
 import { UEBUNGS_TIPPS } from './tipps';
-import { ICH, dartsVon, neueId, type Aufnahme, type Dart, type SpielArt, type X01Match } from './speicher';
+import { ICH, dartsVon, aufnahmenVon, neueId, type Aufnahme, type Dart, type SpielArt, type X01Match } from './speicher';
 import { auswerten, aufnahmeFertig, average, legStand, type X01Regeln } from './x01';
 
 const T20: Ziel = { seg: 20, ring: 'T' };
@@ -517,7 +517,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'x01', darts: dartsVon(aufnahmen.filter((a) => !a.bot), match.spieler[botAmZug ? ich : s]) }}
+      tipp={{ art: 'x01', darts: dartsVon(aufnahmen.filter((a) => !a.bot), match.spieler[botAmZug ? ich : s]), aufnahmen: aufnahmenVon(aufnahmen.filter((a) => !a.bot), match.spieler[botAmZug ? ich : s]) }}
       onMenu={onMenu}
       oben={oben}
       snackText={snack}

@@ -1,5 +1,6 @@
 // Tipps: allgemeine Themen, Tipps je Übung und Hinweise aus dem eigenen Wurfbild.
-// Texte in eigenen Worten nach gängigen Trainingsgrundlagen – Anstöße, kein Ersatz für einen Trainer.
+// Texte in eigenen Worten nach gängigen Trainer-Ratgebern (u. a. cleverdarts.com, thedartscout.com, dartsplanet.tv,
+// mydartfinder.com, shotdarts.com; gelesen 16.11.2026) – Anstöße, kein Ersatz für einen Trainer.
 import { polar, segAngle, type Hit, type Ziel } from './board';
 import { klasse } from './klassen';
 import type { SpielArt } from './speicher';
@@ -160,42 +161,43 @@ export interface WurfbildTipp {
   uebung: string;
 }
 
-const RAT: Record<Richtung, Omit<WurfbildTipp, 'richtung' | 'staerke' | 'anteil' | 'muster'>> = {
+// Ursachen nach gängigen Trainer-Ratgebern (siehe Kopf der Datei). Früh losgelassen → hoch, spät → tief.
+export const RAT: Record<Richtung, Omit<WurfbildTipp, 'richtung' | 'staerke' | 'anteil' | 'muster'>> = {
   unten: {
-    ursache: 'Häufig wird der Dart zu früh losgelassen oder der Arm bremst nach dem Loslassen ab.',
+    ursache: 'Meist geht der Dart zu spät aus der Hand – oft, weil der Griff zu fest ist. Auch ein absackender Ellbogen, zu viel Gewicht auf dem hinteren Fuß oder eine Hand, die nach dem Loslassen zurückzuckt, schicken ihn nach unten.',
     probier: [
-      'Bewusst durchschwingen: Arm nach dem Wurf zum Ziel ausstrecken und kurz stehen lassen.',
-      'Den Dart einen Moment später loslassen.',
-      'Prüfen, ob der Ellbogen beim Wurf absackt.',
+      'Griff lockern: den Dart 3 Sekunden fest drücken, dann lösen, bis er gerade noch in den Fingern liegt – so locker werfen.',
+      'Arm nach dem Wurf ausgestreckt stehen lassen, bis der Dart steckt.',
+      'Gewicht nach vorn, bis die hintere Ferse leicht abhebt.',
     ],
-    uebung: 'Zieltraining auf dein Ziel, nur auf das Durchschwingen achten.',
+    uebung: 'Einfrier-Test: nach jedem Wurf 2 Sekunden stehen bleiben. Zeigt der Zeigefinger aufs Ziel, ist der Arm ganz gestreckt?',
   },
   oben: {
-    ursache: 'Häufig wird der Dart zu spät losgelassen oder mit zu viel Kraft aus dem Handgelenk geworfen.',
+    ursache: 'Meist geht der Dart zu früh aus der Hand, oder das Handgelenk schnippt nach. Auch ein zu lockerer Griff, bei dem der Dart beim Ausholen schon rutscht, schickt ihn nach oben.',
     probier: [
-      'Lockerer werfen, weniger Kraft – der Dart braucht weniger, als man denkt.',
-      'Den Dart einen Moment früher loslassen.',
-      'Den Ellbogen beim Ausholen nicht hochziehen.',
+      'Den Dart etwas länger führen und erst vorn loslassen.',
+      'Handgelenk ruhiger – der Schwung kommt aus dem Unterarm.',
+      'Griff eine Spur fester, nur so viel, dass der Dart beim Ausholen nicht rutscht.',
     ],
-    uebung: 'Zieltraining mit bewusst ruhigem, lockerem Wurf.',
+    uebung: 'Halbe Distanz: aus etwa 1,2 m locker auf die Mitte werfen. Sitzen die Darts dort eng, liegt es am Zeitpunkt des Loslassens – dieses Gefühl mit zurück an die Linie nehmen.',
   },
   links: {
-    ursache: 'Meist läuft der Arm nicht auf einer geraden Linie zum Ziel, oder Schulter bzw. Oberkörper drehen mit.',
+    ursache: 'Der Arm läuft nicht auf einer geraden Linie zum Ziel: Die Schulter dreht mit, der Ellbogen wandert zur Seite, oder die Hand greift schon nach dem nächsten Dart. Liegen die Darts gleichmäßig versetzt, ist es oft einfach der Stand.',
     probier: [
-      'Auge, Dart und Ziel auf eine Linie bringen – schon beim Ausholen.',
-      'Ellbogen unter dem Dart halten, nicht seitlich wegdrehen.',
-      'Stand prüfen: Steht der vordere Fuß jedes Mal gleich?',
+      'Zuerst den Stand prüfen: vorderen Fuß ein kleines Stück verschieben oder den ganzen Stand leicht drehen – statt anders zu zielen.',
+      'Schulter, Ellbogen und Fingerspitzen auf eine Linie zum Ziel bringen, schon beim Ausholen.',
+      'Jeden Wurf ganz zu Ende bringen und erst dann den nächsten Dart greifen.',
     ],
-    uebung: 'Zieltraining auf Bull oder die 20 und auf die gerade Armlinie achten.',
+    uebung: 'Augen-zu-Test: an der Linie in Wurfhaltung stehen und 5 Sekunden die Augen schließen. Schwankst du, ist der Stand nicht stabil genug – Füße etwas weiter auseinander, Gewicht nach vorn.',
   },
   rechts: {
-    ursache: 'Meist läuft der Arm nicht auf einer geraden Linie zum Ziel, oder Schulter bzw. Oberkörper drehen mit.',
+    ursache: 'Der Arm läuft nicht auf einer geraden Linie zum Ziel: Die Schulter dreht mit, der Ellbogen wandert zur Seite, oder die Hand greift schon nach dem nächsten Dart. Liegen die Darts gleichmäßig versetzt, ist es oft einfach der Stand.',
     probier: [
-      'Auge, Dart und Ziel auf eine Linie bringen – schon beim Ausholen.',
-      'Ellbogen unter dem Dart halten, nicht seitlich wegdrehen.',
-      'Stand prüfen: Steht der vordere Fuß jedes Mal gleich?',
+      'Zuerst den Stand prüfen: vorderen Fuß ein kleines Stück verschieben oder den ganzen Stand leicht drehen – statt anders zu zielen.',
+      'Schulter, Ellbogen und Fingerspitzen auf eine Linie zum Ziel bringen, schon beim Ausholen.',
+      'Jeden Wurf ganz zu Ende bringen und erst dann den nächsten Dart greifen.',
     ],
-    uebung: 'Zieltraining auf Bull oder die 20 und auf die gerade Armlinie achten.',
+    uebung: 'Augen-zu-Test: an der Linie in Wurfhaltung stehen und 5 Sekunden die Augen schließen. Schwankst du, ist der Stand nicht stabil genug – Füße etwas weiter auseinander, Gewicht nach vorn.',
   },
 };
 

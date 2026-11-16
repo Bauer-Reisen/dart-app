@@ -2,8 +2,8 @@ import { useRef, useState } from 'react';
 import { gruppenLegs, nachBereich, type Bereich } from './gruppe';
 import { points, zielLabel, type Ziel } from './board';
 import { RUNDEN, rundenName } from './halveit';
-import { wurfbild, wurfbildTipps } from './tipps';
-import { WurfbildHinweis } from './TippFenster';
+import { TrainerHinweis } from './TippFenster';
+import { allgemeineTipps, zielTipps } from './coach';
 import { aussage, klasse, nachbarn, type Klasse } from './klassen';
 import { dartfolge, MIN_N, quoteText } from './dartfolge';
 import { treffpunkt, treffpunktText } from './treffpunkt';
@@ -357,6 +357,12 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
       )}
 
       {zeilen.length === 0 &&<p className="info">Noch keine Würfe. Starte ein Training oder ein Spiel.</p>}
+      {allgemeineTipps(meine).length > 0 && (
+        <div className="karte">
+          <div className="karte-kopf"><strong>Was dem Trainer auffällt</strong></div>
+          {allgemeineTipps(meine).map((t) => <TrainerHinweis key={t.id} t={t} />)}
+        </div>
+      )}
       {zeilen.length > 0 && <h3>Trefferbild je Ziel</h3>}
 
       {zeilen.map((z) => {
@@ -385,7 +391,7 @@ export function Statistik({ aufnahmen: alle, onErsetzen, ich = ICH, onSpieler }:
             )}
             <DartfolgeZeilen f={dartfolge(meine, z.ziel)} />
             <TreffpunktZeile darts={meineDarts} ziel={z.ziel} />
-            {wurfbildTipps(wurfbild(meineDarts, z.ziel)).map((t) => <WurfbildHinweis key={t.richtung} t={t} />)}
+            {zielTipps(meineDarts, z.ziel).map((t) => <TrainerHinweis key={t.id} t={t} />)}
           </div>
         );
       })}

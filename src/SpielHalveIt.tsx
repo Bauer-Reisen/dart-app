@@ -2,7 +2,7 @@
 import { sameZiel } from './board';
 import { EingabeView, useEingabe } from './Eingabe';
 import { RUNDEN, halveStand, rundenKurz, rundenName, rundenPunkte, rundenZiele, zielFrei } from './halveit';
-import { dartsVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
+import { dartsVon, aufnahmenVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
 
 interface Props {
   match: Match;
@@ -133,7 +133,7 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'halveit', darts: dartsVon(aufnahmen, match.spieler[s]) }}
+      tipp={{ art: 'halveit', darts: dartsVon(aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(aufnahmen, match.spieler[s]) }}
       onMenu={onMenu}
       oben={oben}
       snackText={snack}

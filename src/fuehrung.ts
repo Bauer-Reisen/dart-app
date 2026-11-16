@@ -3,7 +3,8 @@
 import { sameZiel, zielLabel, type Ziel } from './board';
 import { klasse } from './klassen';
 import type { Aufnahme, Dart } from './speicher';
-import { richtung, wurfbild, wurfbildTipps, type Richtung } from './tipps';
+import { zielTipps, type CoachTipp } from './coach';
+import { richtung, type Richtung } from './tipps';
 
 export const RUNDE = 10; // Aufnahmen pro geführter Runde
 const MIN_ZIEL = 30;     // so viele Darts auf ein Ziel, bevor es bewertet wird
@@ -70,22 +71,19 @@ export function trainingsVorschlag(darts: Dart[]): Vorschlag {
     };
   }
 
-  // 1. Ein klares Muster (z. B. meist zu tief) hat Vorrang – dort bringt eine Anpassung am meisten.
-  let bester: { z: Ziel; t: ReturnType<typeof wurfbildTipps>[number] } | null = null;
+  // 1. Ein klarer Befund des Trainers (versetzt, gestreut, Muster) hat Vorrang – dort bringt eine Anpassung am meisten.
+  let bester: { z: Ziel; t: CoachTipp } | null = null;
   for (const e of ziele) {
-    const t = wurfbildTipps(wurfbild(ds, e.z))[0];
-    if (t && (!bester || (t.staerke === 'deutlich' ? 1 : 0) + t.anteil > (bester.t.staerke === 'deutlich' ? 1 : 0) + bester.t.anteil)) {
-      bester = { z: e.z, t };
-    }
+    const t = zielTipps(ds, e.z).find((x) => !x.lob);
+    if (t && (!bester || t.gewicht > bester.t.gewicht)) bester = { z: e.z, t };
   }
   if (bester) {
-    const pz = Math.round(bester.t.anteil * 100);
-    const richtungText = { oben: 'zu hoch', unten: 'zu tief', links: 'nach links', rechts: 'nach rechts' }[bester.t.richtung];
+    const richtungText = bester.t.richtung ? { oben: 'zu hoch', unten: 'zu tief', links: 'nach links', rechts: 'nach rechts' }[bester.t.richtung] : '';
     return {
       ziel: bester.z,
       richtung: bester.t.richtung,
-      titel: `${RUNDE} Aufnahmen auf ${zielLabel(bester.z)}: weniger ${richtungText}`,
-      grund: `Auf ${zielLabel(bester.z)} gehen ${pz} % deiner Fehlwürfe ${richtungText}. ${bester.t.ursache}`,
+      titel: `${RUNDE} Aufnahmen auf ${zielLabel(bester.z)}: ${richtungText ? 'weniger ' + richtungText : 'gleichmäßiger werfen'}`,
+      grund: `${bester.t.titel}. ${bester.t.warum}${bester.t.ursache ? ' ' + bester.t.ursache : ''}`,
       fokus: bester.t.probier[0],
     };
   }

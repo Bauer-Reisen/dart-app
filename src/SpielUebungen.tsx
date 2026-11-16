@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { zielLabel, type Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
 import { EingabeView, useEingabe } from './Eingabe';
-import { dartsVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
+import { dartsVon, aufnahmenVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
 import {
   ATC_FOLGE, BOB_FOLGE, DOPPEL_RUNDEN, atcStand, atcZiel, bobStand, bobTrifft, bobWert, bobZiel,
   doppelStand, doppelTrifft, doppelZiel, zufallsReste, type AtcVariante,
@@ -121,7 +121,7 @@ export function AtcSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'atc', darts: dartsVon(p.aufnahmen, match.spieler[s]) }}
+      tipp={{ art: 'atc', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={
         <Tafel
@@ -202,7 +202,7 @@ export function BobsSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'bobs', darts: dartsVon(p.aufnahmen, match.spieler[s]) }}
+      tipp={{ art: 'bobs', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={
         <Tafel
@@ -314,7 +314,7 @@ export function DoppelSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'doppel', darts: dartsVon(p.aufnahmen, match.spieler[s]) }}
+      tipp={{ art: 'doppel', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={
         <Tafel

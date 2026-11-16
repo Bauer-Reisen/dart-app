@@ -1,11 +1,12 @@
 // Zieltraining: freies Werfen auf ein selbst gewähltes Ziel – frei oder geführt (Vorschlag aus dem Trefferbild).
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { FOKUS_DAUER, zuruf, zurufeAn, zurufeSetzen, type Zuruf } from './coach';
 import { sameZiel, zielLabel, type Ziel } from './board';
 import { EingabeView, summe, useEingabe } from './Eingabe';
 import { Erklaerung, einmalGesehen, einmalMerken } from './Hilfe';
 import { RUNDE, auswerten, type Fuehrung } from './fuehrung';
 import { MIN_FEHL } from './tipps';
-import { ICH, dartsVon, type Aufnahme } from './speicher';
+import { ICH, dartsVon, aufnahmenVon, type Aufnahme } from './speicher';
 
 const START_CHIPS: Ziel[] = [
   { seg: 20, ring: 'T' },
@@ -20,6 +21,7 @@ const SO_GEHTS = (
     <li>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – <b>in der Reihenfolge, wie du geworfen hast</b> (Felder 1., 2., 3.). Nur so sieht die App, wie sicher dein 1., 2. und 3. Dart ist. Tippe möglichst <b>genau an die Stelle</b>, wo er steckt – dann zeigt die Statistik auch, wie weit du im Schnitt neben der Zielmitte liegst. Nach 3 Darts ist die Aufnahme gespeichert.</li>
     <li>Die App merkt sich zu jedem Ziel, wie oft du triffst und <b>wohin du danebenwirfst</b>. Das siehst du in der <b>Statistik</b> unter „Trefferbild je Ziel".</li>
     <li>Ab {MIN_FEHL} Fehlwürfen auf ein Ziel erkennt die App ein Muster (z. B. „meist zu tief"). Dann <b>leuchtet die 💡</b> mit einem Tipp und einer passenden Übung.</li>
+    <li>Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b> – z. B. wenn die letzten Aufnahmen alle tief gehen, oder einen Punkt, auf den du ein paar Aufnahmen lang achtest. Danach sagt er dir, ob es damit besser lief. Abschalten kannst du das hier unter 💡.</li>
     <li>Im Reiter Training steht dann ein <b>Trainingsvorschlag</b>: {RUNDE} Aufnahmen auf dein Sorgen-Ziel mit einem Punkt, auf den du achtest – danach siehst du, ob es besser wird.</li>
   </ul>
 );
@@ -64,6 +66,27 @@ export function Training({ aufnahmen, hinzufuegen, letzteEntfernen, onMenu, spie
   }, [fuehrung?.seit]);
 
   const anzahl = aufnahmen.filter(istTraining).length;
+
+  // Trainer-Zurufe: nur für dieses Training (seit dem Öffnen)
+  const [seit] = useState(() => Date.now());
+  const [zurufe, setZurufe] = useState(zurufeAn);
+  const [zr, setZr] = useState<Zuruf | null>(null);
+  const verlauf = useRef<Zuruf[]>([]);
+  const sitzung = aufnahmen.filter((a) => istTraining(a) && a.start >= seit).sort((a, b) => a.start - b.start);
+  useEffect(() => {
+    if (!zurufe || !sitzung.length) return;
+    const z = zuruf(sitzung, dartsVon(aufnahmen, spieler), verlauf.current, !fuehrung);
+    if (z) { verlauf.current = [...verlauf.current, z]; setZr(z); }
+    // nur nach jeder neuen Aufnahme
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sitzung.length]);
+  const zSichtbar = zurufe && zr && (sitzung.length - zr.bei < 2 || (zr.art === 'fokus' && sitzung.length < zr.bei + FOKUS_DAUER)) ? zr : null;
+  const zurufSchalter = (
+    <label className="schalter-zeile">
+      <input type="checkbox" checked={zurufe} onChange={(ev) => { setZurufe(ev.target.checked); zurufeSetzen(ev.target.checked); if (!ev.target.checked) setZr(null); }} />
+      Trainer-Zurufe während des Trainings
+    </label>
+  );
   const sichtbar = e.darts.length ? e.darts : e.zuletzt ?? [];
 
   const inRunde = fuehrung ? aufnahmen.filter((a) => istTraining(a) && a.start >= fuehrung.seit).length : 0;
@@ -74,13 +97,23 @@ export function Training({ aufnahmen, hinzufuegen, letzteEntfernen, onMenu, spie
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'training', darts: dartsVon(aufnahmen, spieler), soGehts: SO_GEHTS }}
+      tipp={{ art: 'training', darts: dartsVon(aufnahmen, spieler), aufnahmen: aufnahmenVon(aufnahmen, spieler), soGehts: SO_GEHTS, extra: zurufSchalter }}
       onMenu={onMenu}
-      oben={fuehrung && (
-        <div className="fokus-leiste">
-          <span>Achte auf: <b>{fuehrung.fokus}</b></span>
-          <span>{Math.min(inRunde + (e.darts.length ? 1 : 0), RUNDE)}/{RUNDE}</span>
-        </div>
+      oben={(fuehrung || zSichtbar) && (
+        <>
+          {fuehrung && (
+            <div className="fokus-leiste">
+              <span>Achte auf: <b>{fuehrung.fokus}</b></span>
+              <span>{Math.min(inRunde + (e.darts.length ? 1 : 0), RUNDE)}/{RUNDE}</span>
+            </div>
+          )}
+          {zSichtbar && (
+            <div className={'zuruf ' + zSichtbar.art} role="status">
+              <span><b>Trainer:</b> {zSichtbar.text}{zSichtbar.art === 'fokus' && <> <small>(Aufnahme {Math.min(sitzung.length - zSichtbar.bei + 1, FOKUS_DAUER)} von {FOKUS_DAUER})</small></>}</span>
+              <button onClick={() => setZr(null)} aria-label="Zuruf schließen">✕</button>
+            </div>
+          )}
+        </>
       )}
       kopfInfo={
         <>

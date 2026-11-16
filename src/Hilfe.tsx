@@ -22,6 +22,16 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.10.0', titel: 'Der Trainer schaut genauer hin',
+    rundgang: ['training', 'statistik'],
+    punkte: [
+      <>Die App unterscheidet jetzt: Liegen deine Darts <b>eng, aber versetzt</b> (dann nur Stand oder Griff anpassen) oder <b>weit gestreut</b> (dann geht es um einen gleichmäßigen Ablauf)? Dazu: streust du eher in der Höhe oder zur Seite – und <b>welche Doppel</b> passen deshalb zu dir.</>,
+      <>Neu sind auch Hinweise zu deinem <b>1., 2. und 3. Dart</b>, zu Fehlwürfen und dazu, ob du am Anfang Einwerfen brauchst oder gegen Ende nachlässt. Bei jedem Tipp steht, <b>woran die App das sieht</b>.</>,
+      <>Im Zieltraining <b>ruft dir der Trainer ab und zu etwas zu</b> – z. B. wenn die letzten Aufnahmen alle tief gehen – oder gibt dir einen Punkt für die nächsten 5 Aufnahmen und sagt danach, ob es geholfen hat. Abschalten unter 💡.</>,
+      <>Die Tipps stützen sich jetzt auf Ratgeber von Dart-Trainern. Dabei wurde ein Fehler behoben: Zu früh losgelassen geht der Dart <b>hoch</b>, zu spät <b>tief</b>.</>,
+    ],
+  },
+  {
     v: '0.9.0', titel: 'Allein oder in der Gruppe',
     rundgang: ['statistik'],
     punkte: [
@@ -117,8 +127,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – möglichst genau an die Stelle und der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. Ein Dart zählt, sobald du loslässt. Zum genauen Tippen ziehst du die Scheibe mit <b>zwei Fingern</b> auf. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
   },
   {
-    id: 'training', stand: '0.5.0', icon: '🏋️', titel: 'Training',
-    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wohin du danebenwirfst. Sobald sie dein Wurfbild kennt, macht sie oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
+    id: 'training', stand: '0.10.0', icon: '🏋️', titel: 'Training',
+    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wo deine Darts landen. Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b>, und sobald er dein Wurfbild kennt, macht er oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
   },
   {
     id: 'wer', stand: '0.7.0', icon: '👥', titel: 'Wer wirft?',
@@ -133,8 +143,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Spielst du in einer Liga? Verbinde die App mit deiner Liga (Bayerischer Dart-Verband) oder trag Spieltage selbst ein. Dann bekommst du einen Plan bis zum nächsten Spieltag.</>,
   },
   {
-    id: 'statistik', stand: '0.9.0', icon: '📊', titel: 'Statistik und 💡',
-    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Leuchtet im Spiel die <b>💡</b>, hat die App einen Hinweis zu deinem Wurfbild für dich.</>,
+    id: 'statistik', stand: '0.10.0', icon: '📊', titel: 'Statistik und 💡',
+    text: <>Die <b>Statistik</b> zeigt Average, Doppelquote und dein Trefferbild – oben wählst du <b>Alle</b>, <b>Allein</b> oder <b>In der Gruppe</b>. Darunter steht, <b>was dem Trainer auffällt</b>: ob deine Darts eng oder gestreut liegen, welche Doppel zu dir passen, wie dein 3. Dart ist – jeweils mit Grund und was du probieren kannst. Leuchtet die <b>💡</b>, gibt es einen neuen Hinweis.</>,
   },
   {
     id: 'daten', stand: '0.3.0', icon: '💾', titel: 'Deine Daten',

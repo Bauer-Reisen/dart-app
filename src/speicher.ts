@@ -31,6 +31,10 @@ export interface Aufnahme {
 export const ICH = 'Ich';
 
 /** Alle Darts eines Spielers (für Trefferbild und Tipps). */
+export function aufnahmenVon(aufnahmen: Aufnahme[], spieler: string): Aufnahme[] {
+  return aufnahmen.filter((a) => !a.bot && (a.spieler ?? ICH) === spieler);
+}
+
 export function dartsVon(aufnahmen: Aufnahme[], spieler: string): Dart[] {
   return aufnahmen.filter((a) => (a.spieler ?? ICH) === spieler).flatMap((a) => a.darts);
 }

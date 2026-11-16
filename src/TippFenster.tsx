@@ -1,37 +1,46 @@
-// 💡: Tipps zur Übung und Hinweise aus dem eigenen Wurfbild.
+// 💡: Tipps zur Übung und Hinweise des Trainers aus dem eigenen Wurfbild.
 import { useState, type ReactNode } from 'react';
-import { zielLabel, type Hit, type Ziel } from './board';
-import { MIN_FEHL, UEBUNGS_TIPPS, wurfbild, wurfbildTipps, type TippArt, type WurfbildTipp } from './tipps';
+import { zielLabel, type Ziel } from './board';
+import { MIN_LAGE, allgemeineTipps, zielTipps, type CoachTipp } from './coach';
+import type { Aufnahme, Dart } from './speicher';
+import { MIN_FEHL, UEBUNGS_TIPPS, wurfbild, type TippArt } from './tipps';
 
 export interface TippQuelle {
   art: TippArt;
   /** Alle bisherigen Darts des Spielers am Zug. */
-  darts: { hit: Hit; ziel: Ziel; frei?: boolean }[];
+  darts: Dart[];
+  /** Aufnahmen des Spielers – für Hinweise, die nicht an einem Ziel hängen (3. Dart, Ermüdung, Doppel). */
+  aufnahmen?: Aufnahme[];
   /** Kurze Erklärung der Seite, oben im Fenster („So geht's"). */
   soGehts?: ReactNode;
+  /** Zusätzlich unten im Fenster (z. B. Schalter für Zurufe). */
+  extra?: ReactNode;
 }
 
-export function WurfbildHinweis({ t }: { t: WurfbildTipp }) {
+export function TrainerHinweis({ t }: { t: CoachTipp }) {
   return (
-    <div className="hinweis">
-      <div><b>{t.muster}</b></div>
-      <div>{t.ursache}</div>
+    <div className={'hinweis' + (t.lob ? ' lob' : '')}>
+      <div><b>{t.titel}</b></div>
+      <div className="warum">Woran ich das sehe: {t.warum}</div>
+      {t.ursache && <div>{t.ursache}</div>}
       <ul>{t.probier.map((p) => <li key={p}>{p}</li>)}</ul>
-      <div className="uebung">Übung: {t.uebung}</div>
+      {t.uebung && <div className="uebung">Übung: {t.uebung}</div>}
     </div>
   );
 }
 
-/** Knopf + Fenster. Der Knopf leuchtet, wenn es einen neuen Hinweis zum Wurfbild gibt. */
+/** Knopf + Fenster. Der Knopf leuchtet, wenn es einen neuen Hinweis gibt. */
 export function useTipp(q: TippQuelle | undefined, ziel: Ziel) {
   const [offen, setOffen] = useState(false);
   const [gesehen, setGesehen] = useState<string[]>([]);
   if (!q) return { knopf: null, fenster: null };
 
-  const w = wurfbild(q.darts, ziel);
-  const hinweise = wurfbildTipps(w);
-  const schluessel = hinweise.map((t) => `${zielLabel(ziel)}:${t.richtung}`);
+  const hinweise = zielTipps(q.darts, ziel);
+  const allgemein = q.aufnahmen ? allgemeineTipps(q.aufnahmen) : [];
+  const schluessel = [...hinweise, ...allgemein].filter((t) => !t.lob).map((t) => t.id);
   const neu = schluessel.some((k) => !gesehen.includes(k));
+  const w = wurfbild(q.darts, ziel);
+  const getippt = q.darts.filter((d) => d.p && !d.frei && d.ziel.seg === ziel.seg && d.ziel.ring === ziel.ring).length;
 
   const knopf = (
     <button
@@ -51,19 +60,23 @@ export function useTipp(q: TippQuelle | undefined, ziel: Ziel) {
 
         <h4>Dein Wurfbild auf {zielLabel(ziel)}</h4>
         {hinweise.length > 0 ? (
-          hinweise.map((t) => <WurfbildHinweis key={t.richtung} t={t} />)
-        ) : w.fehl < MIN_FEHL ? (
+          hinweise.map((t) => <TrainerHinweis key={t.id} t={t} />)
+        ) : w.fehl < MIN_FEHL && getippt < MIN_LAGE ? (
           <p className="info klein">
-            Ab {MIN_FEHL} Fehlwürfen auf dieses Ziel sage ich dir, wohin du meistens danebenwirfst und was helfen kann
-            (bisher {w.fehl}).
+            Sobald genug Würfe auf dieses Ziel da sind ({MIN_LAGE} genau getippte Darts oder {MIN_FEHL} Fehlwürfe), sage ich dir,
+            was bei dir los ist und was helfen kann (bisher {getippt} getippt, {w.fehl} Fehlwürfe).
           </p>
         ) : (
-          <p className="info klein">Kein klares Muster – deine Fehlwürfe verteilen sich. Das ist gut: Dann hilft vor allem ein gleichbleibender Ablauf.</p>
+          <p className="info klein">Kein klares Muster – deine Fehlwürfe verteilen sich. Dann hilft vor allem ein gleichbleibender Ablauf.</p>
         )}
+
+        {allgemein.length > 0 && (<><h4>Was mir sonst auffällt</h4>{allgemein.map((t) => <TrainerHinweis key={t.id} t={t} />)}</>)}
 
         <h4>Zu dieser Übung</h4>
         <ul>{UEBUNGS_TIPPS[q.art].map((p) => <li key={p}>{p}</li>)}</ul>
+        {q.extra}
 
+        <p className="info klein">Die App sieht nur, wo deine Darts landen – nicht, wie du wirfst. Die Tipps sind Anstöße nach gängigen Trainer-Ratgebern. Probier immer nur eine Sache auf einmal.</p>
         <button className="btn gross" style={{ width: '100%', marginTop: 14 }} onClick={() => setOffen(false)}>Schließen</button>
       </div>
     </div>

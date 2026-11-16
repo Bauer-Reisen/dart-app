@@ -1,7 +1,7 @@
 // Cricket: Spielbildschirm mit Strich-Tafel.
 import { NUMMERN, cricketStand, cricketVorschlag, mpr, nutzDerAufnahme, striche, zeichen, zielVon } from './cricket';
 import { EingabeView, useEingabe } from './Eingabe';
-import { dartsVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
+import { dartsVon, aufnahmenVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
 
 interface Props {
   match: Match;
@@ -162,7 +162,7 @@ export function CricketSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
   return (
     <EingabeView
       e={e}
-      tipp={{ art: 'cricket', darts: dartsVon(aufnahmen, match.spieler[s]) }}
+      tipp={{ art: 'cricket', darts: dartsVon(aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(aufnahmen, match.spieler[s]) }}
       onMenu={onMenu}
       oben={oben}
       snackText={snack}
