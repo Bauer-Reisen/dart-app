@@ -508,3 +508,9 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .zuruf.bilanz { background: #16281a; border-color: #2f5a36; }
 .schalter-zeile { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
 .schalter-zeile input { width: 22px; height: 22px; }
+.doppel-frage { background: var(--fl); border-bottom: 1px solid #333; padding: 8px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.doppel-frage > span { font-weight: 600; flex: 1 1 auto; }
+.doppel-frage small { flex-basis: 100%; color: var(--leise); }
+.doppel-knoepfe { display: flex; gap: 6px; }
+.doppel-knoepfe .btn { min-width: 48px; min-height: 44px; padding: 0 10px; font-size: 18px; }
+.wahl-box .doppel-frage { border: 1px solid #444; border-radius: 12px; margin: 8px 0 12px; }

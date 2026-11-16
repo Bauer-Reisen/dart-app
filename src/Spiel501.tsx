@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ansageLaden, ansageMoeglich, ansageSpeichern, entsperren, punkteText, requireText, sprich, stimmeLaden, stimmen, stimmeSpeichern, type AnsageArt } from './ansage';
 import type { Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
+import { doppelFrage, type DoppelFrage } from './doppel';
 import { EingabeView, useEingabe } from './Eingabe';
 import { computerAufnahme, sigmaFuer } from './gegner';
 import { simulationMerken } from './liga';
@@ -299,6 +300,7 @@ interface Props {
   hinzufuegen: (a: Aufnahme) => void;
   letzteEntfernen: (pruef: (a: Aufnahme) => boolean, mitBot?: boolean) => Aufnahme | null;
   onMenu: () => void;
+  aendern?: (start: number, spieler: string, patch: Partial<Aufnahme>) => void;
 }
 
 const hits = (d: Dart[]) => d.map((x) => x.hit);
@@ -310,7 +312,9 @@ function standVon(match: X01Match, legId: string, starter: number, aufnahmen: Au
   return { legAuf, stand: legStand(match.spieler.length, starter, regeln, legAuf.map((a) => ({ hits: hits(a.darts) }))) };
 }
 
-export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfernen, onMenu }: Props) {
+export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfernen, onMenu, aendern }: Props) {
+  // Nach einer Aufnahme mit Doppel-Chance: „Wie viele Darts aufs Doppel?“ (Schätzung vorausgewählt)
+  const [frage, setFrage] = useState<(DoppelFrage & { start: number; spieler: string; wahl: number | null }) | null>(null);
   const n = match.spieler.length;
   const leg = match.legs[match.legs.length - 1];
   const { legAuf, stand } = standVon(match, leg.id, leg.starter, aufnahmen);
@@ -342,6 +346,9 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
     fertigNach: (d) => aufnahmeFertig(rest, hits(d), dOut),
     onFertig: (d) => {
       const a = auswerten(rest, hits(d), dOut);
+      const f = doppelFrage(rest, hits(d), dOut);
+      // Frage bleibt stehen, bis derselbe Spieler wieder geworfen hat
+      setFrage((alt) => (f ? { ...f, start: d[0].t, spieler: match.spieler[s], wahl: null } : alt && alt.spieler !== match.spieler[s] ? alt : null));
       hinzufuegen({
         darts: d,
         start: d[0].t,
@@ -422,7 +429,23 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
         : <>{letzte.spieler}: <b>{a.punkte}</b> · Rest {a.restNachher}</>;
   }
 
+  // nur fragen, wenn es wirklich eine Wahl gibt (z. B. nicht bei einem einzigen Dart aufs Doppel, der ausmacht)
+  const frageAktiv = frage && frage.max > frage.min && legAuf.some((a) => a.start === frage.start && !a.bot) ? frage : null;
+  const frageZeile = frageAktiv && (
+    <div className="doppel-frage">
+      <span>{n > 1 ? `${frageAktiv.spieler}: ` : ''}Wie viele Darts gingen aufs Doppel?</span>
+      <div className="doppel-knoepfe">
+        {Array.from({ length: frageAktiv.max - frageAktiv.min + 1 }, (_, i) => frageAktiv.min + i).map((k) => (
+          <button key={k} className={'btn' + ((frageAktiv.wahl ?? frageAktiv.schaetzung) === k ? ' an' : '')}
+            onClick={() => { aendern?.(frageAktiv.start, frageAktiv.spieler, { doppelDarts: k }); setFrage({ ...frageAktiv, wahl: k }); }}>{k}</button>
+        ))}
+      </div>
+      <small>{frageAktiv.wahl === null ? 'Gelb = geschätzt. Stimmt es, einfach weiterwerfen.' : 'Gespeichert ✓'}</small>
+    </div>
+  );
+
   const oben = (
+    <>
     <div className={'tafel n' + n}>
       {match.spieler.map((name, i) => {
         const av = average(stand.punkte[i], stand.darts[i]);
@@ -438,6 +461,8 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
         );
       })}
     </div>
+    {frageZeile}
+    </>
   );
 
   // Average eines Spielers über alle Legs dieses Matches
@@ -476,6 +501,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
       <div className="wahl mitte">
         <div className="wahl-box ende">
           <h3>🏆 {nameVon(matchSieger)} gewinnt {legsGewonnen[matchSieger]} : {Math.max(...legsGewonnen.filter((_, i) => i !== matchSieger))}</h3>
+          {frageZeile}
           {match.spieler.map((_, i) => (
             <p key={i}>{bot?.platz === i ? `Computer (eingestellt Ø ${bot.avg})` : match.spieler[i]}: Ø <b>{matchAvg(i)?.toFixed(1) ?? '–'}</b></p>
           ))}
@@ -492,6 +518,7 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
       <div className="wahl mitte">
         <div className="wahl-box ende">
           <h3>🎯 {nameVon(g)} gewinnt das Leg!</h3>
+          {frageZeile}
           <p>
             {stand.darts[g]} Darts · Ø {average(stand.punkte[g], stand.darts[g])?.toFixed(1)}
           </p>

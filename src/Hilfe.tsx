@@ -22,6 +22,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.10.1', titel: 'Darts aufs Doppel',
+    rundgang: ['spiele'],
+    punkte: [
+      <>Bei 501 fragt die App nach einer Aufnahme, in der du ausmachen konntest: <b>Wie viele Darts gingen aufs Doppel?</b> Gelb ist ihre Schätzung – stimmt sie, wirf einfach weiter. So wird deine <b>Doppelquote</b> genau.</>,
+    ],
+  },
+  {
     v: '0.10.0', titel: 'Der Trainer schaut genauer hin',
     rundgang: ['training', 'statistik'],
     punkte: [
@@ -135,8 +142,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Oben in Training, Spiele, Liga und Statistik steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik und seine eigene Liga.</>,
   },
   {
-    id: 'spiele', stand: '0.8.0', icon: '🎮', titel: 'Spiele',
-    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt.</>,
+    id: 'spiele', stand: '0.10.1', icon: '🎮', titel: 'Spiele',
+    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote.</>,
   },
   {
     id: 'liga', stand: '0.7.0', icon: '🏆', titel: 'Liga',

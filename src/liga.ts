@@ -1,6 +1,7 @@
 // Liga: Spieltage, Ergebnisse, Vorbereitung. Alles nur auf diesem Gerät.
 import { ICH, neueId, type Aufnahme } from './speicher';
 import { auswerten } from './x01';
+import { doppelWerte } from './doppel';
 
 export interface LigaSpiel {
   id: string;
@@ -243,6 +244,7 @@ export function doppelQuote(aufnahmen: Aufnahme[], seit: number, ich = ICH): { q
   let t = 0;
   for (const a of aufnahmen) {
     if (a.bot || (a.spieler ?? ICH) !== ich || a.start < seit) continue;
+    if (a.modus === 'x01') { const w = doppelWerte(a); n += w.vers; t += w.treff; continue; }
     for (const d of a.darts) {
       if (d.frei || d.ziel.ring !== 'D') continue;
       n++;

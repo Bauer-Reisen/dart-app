@@ -11,7 +11,8 @@ import { TrefferBild } from './TrefferBild';
 import { alsDateiSichern, ausDateiLaden, ICH, type Aufnahme } from './speicher';
 import { ligaAlle, ligaAlleSetzen, type LigaDaten } from './liga';
 import { SpielerLeiste } from './SpielerWahl';
-import { auswerten, average, istDoppel } from './x01';
+import { auswerten, average } from './x01';
+import { doppelWerte } from './doppel';
 
 interface Props {
   aufnahmen: Aufnahme[];
@@ -38,16 +39,9 @@ function x01Werte(liste: Aufnahme[]) {
     if (e.punkte === 180) c180++;
     else if (e.punkte >= 140) c140++;
     else if (e.punkte >= 100) c100++;
-    // Darts auf ein Doppel, mit dem man hätte ausmachen können
-    let r = rest;
-    for (const d of a.darts) {
-      if (dOut && (r === 50 || (r <= 40 && r % 2 === 0))) {
-        dVers++;
-        if (r - points(d.hit) === 0 && istDoppel(d.hit)) dTreff++;
-      }
-      r -= points(d.hit);
-      if (r <= 1) break;
-    }
+    // Darts aufs Doppel: Angabe nach der Aufnahme, sonst geschätzt aus dem Rest
+    const dw = doppelWerte(a);
+    dVers += dw.vers; dTreff += dw.treff;
     const l = legs.get(a.legId ?? '') ?? { darts: 0, gewonnen: false };
     l.darts += a.darts.length;
     if (a.check) l.gewonnen = true;

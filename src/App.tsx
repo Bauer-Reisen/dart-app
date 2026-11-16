@@ -9,7 +9,7 @@ import { Liga } from './LigaSeite';
 import { CricketSpiel } from './SpielCricket';
 import { HalveItSpiel } from './SpielHalveIt';
 import { AtcSpiel, BobsSpiel, DoppelSpiel } from './SpielUebungen';
-import { laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match, type SpielArt } from './speicher';
+import { ICH, laden, matchLaden, matchSpeichern, speichern, type Aufnahme, type Match, type SpielArt } from './speicher';
 import { alleSpieler, matchUmbenennen, spielerLaden, spielerSpeichern, umbenennen, type SpielerStand } from './spieler';
 import { SpielerFenster } from './SpielerWahl';
 import { fuehrungLaden, fuehrungSpeichern, type Fuehrung } from './fuehrung';
@@ -100,6 +100,15 @@ export function App() {
     });
   }
 
+  /** Eine gespeicherte Aufnahme nachträglich ergänzen (z. B. Darts aufs Doppel). */
+  function aendern(start: number, spieler: string, patch: Partial<Aufnahme>) {
+    setAufnahmen((alt) => {
+      const neu = alt.map((a) => (a.start === start && !a.bot && (a.spieler ?? ICH) === spieler ? { ...a, ...patch } : a));
+      speichern(neu);
+      return neu;
+    });
+  }
+
   /** Letzte Aufnahme entfernen, wenn sie zum aktuellen Spiel gehört. */
   /** mitBot: Würfe des Computer-Gegners davor auch entfernen, bis zur eigenen Aufnahme. */
   function letzteEntfernen(pruef: (a: Aufnahme) => boolean, mitBot = false): Aufnahme | null {
@@ -147,7 +156,7 @@ export function App() {
     const art = ansicht.art;
     const m = matches[art];
     if (m) {
-      const props = { ...gemeinsam, match: m, setMatch: (x: Match | null) => setMatch(art, x) };
+      const props = { ...gemeinsam, aendern, match: m, setMatch: (x: Match | null) => setMatch(art, x) };
       if (art === 'halveit') return <HalveItSpiel key={m.id} {...props} />;
       if (art === 'atc') return <AtcSpiel key={m.id} {...props} />;
       if (art === 'bobs') return <BobsSpiel key={m.id} {...props} />;

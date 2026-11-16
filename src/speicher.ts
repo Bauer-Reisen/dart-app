@@ -24,6 +24,7 @@ export interface Aufnahme {
   doubleOut?: boolean;
   bust?: boolean;
   check?: boolean;
+  doppelDarts?: number; // 501: vom Spieler angegeben – so viele Darts dieser Aufnahme gingen aufs Doppel
   bot?: boolean; // Wurf des Computer-Gegners: zählt nicht in die Statistik
   gruppe?: boolean; // in der Gruppe geworfen (für übernommene Würfe, deren Mitspieler fehlen)
 }
