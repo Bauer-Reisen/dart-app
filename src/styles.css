@@ -615,3 +615,12 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .app.zeige-tafel .ctafel.htafel.normal th { font-size: min(6vh, 3vw); }
 .app.zeige-tafel .ctafel.htafel.normal .cname { font-size: min(8vh, 2.8vw) !important; }
 .app.zeige-tafel .ctafel.htafel.normal .cpkt { font-size: min(11vh, 4.4vw) !important; }
+
+/* 501: Spiel-Average und letzte Aufnahmen */
+.sp-spiel { white-space: nowrap; }
+.sp-letzte { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; min-height: 1.4em; font-size: 12px; color: var(--leise); }
+.sp-letzte span { background: #2a2a2a; border-radius: 6px; padding: 0 6px; font-weight: 700; }
+.sp-letzte span.neu { color: var(--text); }
+.tafel.n1 .sp-letzte { justify-content: flex-end; }
+.app.zeige-tafel .sp-letzte { font-size: clamp(14px, 3vmin, 30px); gap: 0.4em; margin-top: 0.3em; }
+.app.zeige-tafel .sp-letzte span { padding: 0.05em 0.45em; border-radius: 0.3em; }

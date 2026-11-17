@@ -444,6 +444,21 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
     </div>
   );
 
+  // Average im ganzen Spiel (alle Legs) und die letzten Aufnahmen im Leg, neueste zuerst
+  const spielAvg = (i: number) =>
+    average(legStaende.reduce((x, st) => x + st.punkte[i], 0), legStaende.reduce((x, st) => x + st.darts[i], 0));
+  const mehrereLegs = match.legs.length > 1 || !!match.legsZiel;
+  const letzteAufnahmen = (i: number) =>
+    legAuf
+      .map((a, k) => ({ a, k }))
+      .filter(({ k }) => (leg.starter + k) % n === i)
+      .slice(-3)
+      .reverse()
+      .map(({ a }) => {
+        const w = auswerten(a.restVorher ?? match.start, hits(a.darts), a.doubleOut ?? dOut);
+        return w.bust ? 'Bust' : String(w.punkte);
+      });
+
   const oben = (
     <>
     <div className={'tafel n' + n}>
@@ -456,7 +471,13 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
               {match.legs.length > 1 || legsGewonnen[i] || match.legsZiel ? <span className="legs"> · {legsGewonnen[i]}</span> : null}
             </div>
             <div className="sp-rest">{stand.rest[i]}</div>
-            <div className="sp-av">{av !== null ? `Ø ${av.toFixed(1)}` : ' '}</div>
+            <div className="sp-av">
+              {mehrereLegs ? 'Leg ' : ''}Ø {av !== null ? av.toFixed(1) : '–'}
+              {mehrereLegs && <span className="sp-spiel"> · Spiel Ø {spielAvg(i)?.toFixed(1) ?? '–'}</span>}
+            </div>
+            <div className="sp-letzte" aria-label="Letzte Aufnahmen">
+              {letzteAufnahmen(i).map((p, k) => <span key={k} className={k === 0 ? 'neu' : ''}>{p}</span>)}
+            </div>
           </div>
         );
       })}

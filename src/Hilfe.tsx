@@ -22,6 +22,15 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.15.0', titel: '501: mehr auf einen Blick',
+    rundgang: 'klein',
+    punkte: [
+      <>Unter dem Rest steht jetzt der <b>Average im Leg</b> und – bei Best of – der <b>Average im ganzen Spiel</b>.</>,
+      <>Darunter die <b>letzten drei Aufnahmen</b>, die neueste vorne.</>,
+      <>Nach 🎯 siehst du <b>nur noch die Scheibe</b>, über den ganzen Bildschirm. Oben links ↶ nimmt den letzten Dart zurück, oben rechts 📋 zeigt den Spielstand. Abpraller: einfach neben die Scheibe tippen.</>,
+    ],
+  },
+  {
     v: '0.14.0', titel: 'Im Spiel: nur der Spielstand',
     rundgang: ['spiele'],
     punkte: [
