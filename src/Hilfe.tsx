@@ -22,6 +22,15 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.16.0', titel: '⏱ Timer im Training',
+    rundgang: ['training'],
+    punkte: [
+      <>Im Training und in den Übungen oben neben den Dart-Feldern auf <b>⏱</b> tippen: <b>5, 10 oder 15 Minuten</b>. Ohne Timer läuft alles wie bisher.</>,
+      <>Nochmal auf die Zeit tippen: <b>anhalten</b>, weiter oder beenden.</>,
+      <>Ist die Zeit um, piept es, und du siehst, wie viele Darts du geworfen und wie oft du getroffen hast. Dann direkt <b>neues Ziel</b> wählen und die nächste Runde starten.</>,
+    ],
+  },
+  {
     v: '0.15.0', titel: '501: mehr auf einen Blick',
     rundgang: 'klein',
     punkte: [
@@ -173,8 +182,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – möglichst genau an die Stelle und der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. Ein Dart zählt, sobald du loslässt. Zum genauen Tippen ziehst du die Scheibe mit <b>zwei Fingern</b> auf. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
   },
   {
-    id: 'training', stand: '0.10.0', icon: '🏋️', titel: 'Training',
-    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wo deine Darts landen. Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b>, und sobald er dein Wurfbild kennt, macht er oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27.</>,
+    id: 'training', stand: '0.16.0', icon: '🏋️', titel: 'Training',
+    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wo deine Darts landen. Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b>, und sobald er dein Wurfbild kennt, macht er oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27. Mit <b>⏱</b> stellst du einen Timer auf 5, 10 oder 15 Minuten – anhalten geht auch.</>,
   },
   {
     id: 'wer', stand: '0.7.0', icon: '👥', titel: 'Wer wirft?',

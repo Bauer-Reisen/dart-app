@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { zielLabel, type Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
 import { EingabeView, useEingabe } from './Eingabe';
+import { uhrInfo } from './UhrKnopf';
 import { dartsVon, aufnahmenVon, neueId, type Aufnahme, type Dart, type Match } from './speicher';
 import {
   ATC_FOLGE, BOB_FOLGE, DOPPEL_RUNDEN, atcStand, atcZiel, bobStand, bobTrifft, bobWert, bobZiel,
@@ -121,6 +122,7 @@ export function AtcSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
+      uhr={{ auswertung: uhrInfo(dartsVon(p.aufnahmen, match.spieler[s]), false) }}
       tipp={{ art: 'atc', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={
@@ -202,6 +204,7 @@ export function BobsSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
+      uhr={{ auswertung: uhrInfo(dartsVon(p.aufnahmen, match.spieler[s]), false) }}
       tipp={{ art: 'bobs', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={
@@ -314,6 +317,7 @@ export function DoppelSpiel(p: SpielProps) {
   return (
     <EingabeView
       e={e}
+      uhr={{ auswertung: uhrInfo(dartsVon(p.aufnahmen, match.spieler[s]), true) }}
       tipp={{ art: 'doppel', darts: dartsVon(p.aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(p.aufnahmen, match.spieler[s]) }}
       onMenu={p.onMenu}
       oben={

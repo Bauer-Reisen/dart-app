@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Scheibe } from './Scheibe';
 import { ZielWahl } from './ZielWahl';
 import { useTipp, type TippQuelle } from './TippFenster';
+import { useUhr, type UhrOpts } from './UhrKnopf';
 import { echtePosition, hitLabel, hitLabelLang, points, sameZiel, zielLabel, type Hit, type Ziel } from './board';
 import type { Dart } from './speicher';
 
@@ -188,11 +189,14 @@ interface ViewProps {
   tipp?: TippQuelle;
   /** Spiele: nur der Spielstand; die Scheibe öffnet sich per 🎯-Knopf. */
   wechsel?: boolean;
+  /** Training und Übungen: ⏱-Timer (5/10/15 Min.). */
+  uhr?: UhrOpts;
 }
 
-export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp, wechsel }: ViewProps) {
+export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp, wechsel, uhr }: ViewProps) {
   const sichtbar = e.darts.length ? e.darts : e.zuletzt ?? [];
   const t = useTipp(tipp, e.ziel);
+  const u = useUhr(uhr);
 
   // Spiele: Solange keiner wirft, nur der Spielstand (Start und nach jeder Aufnahme).
   // 🎯 öffnet die Scheibe, 📋 zeigt wieder den Spielstand. Der erste Dart lässt die Scheibe offen.
@@ -243,6 +247,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
             </button>
           );
         })}
+        {u.knopf}
         {t.knopf}
       </div>
 
@@ -277,6 +282,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
       {e.wahlOffen && <ZielWahl aktuell={e.ziel} onWahl={e.zielSetzen} onAbbruch={() => e.setWahlOffen(false)} />}
       {overlay}
       {t.fenster}
+      {u.fenster}
     </div>
   );
 }

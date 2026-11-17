@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FOKUS_DAUER, zuruf, zurufeAn, zurufeSetzen, type Zuruf } from './coach';
 import { sameZiel, zielLabel, type Ziel } from './board';
 import { EingabeView, summe, useEingabe } from './Eingabe';
+import { uhrInfo } from './UhrKnopf';
 import { Erklaerung, einmalGesehen, einmalMerken } from './Hilfe';
 import { RUNDE, auswerten, type Fuehrung } from './fuehrung';
 import { MIN_FEHL } from './tipps';
@@ -97,6 +98,7 @@ export function Training({ aufnahmen, hinzufuegen, letzteEntfernen, onMenu, spie
   return (
     <EingabeView
       e={e}
+      uhr={{ auswertung: uhrInfo(dartsVon(aufnahmen, spieler), true), neuesZiel: () => e.setWahlOffen(true) }}
       tipp={{ art: 'training', darts: dartsVon(aufnahmen, spieler), aufnahmen: aufnahmenVon(aufnahmen, spieler), soGehts: SO_GEHTS, extra: zurufSchalter }}
       onMenu={onMenu}
       oben={(fuehrung || zSichtbar) && (
