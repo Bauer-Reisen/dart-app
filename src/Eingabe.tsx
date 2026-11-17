@@ -225,9 +225,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
           ))}
           <button className="chip plus" onClick={() => e.setWahlOffen(true)} aria-label="Anderes Ziel">＋</button>
         </div>}
-        {aktiv && (tafel
-          ? <button className="icon spiel-wechsel" onClick={() => setTafel(false)} aria-label="Scheibe öffnen">🎯</button>
-          : <button className="icon spiel-wechsel" onClick={() => setTafel(true)} aria-label="Spielstand zeigen">📋</button>)}
+        {aktiv && tafel && <button className="icon spiel-wechsel" onClick={() => setTafel(false)} aria-label="Scheibe öffnen">🎯</button>}
       </header>
 
       <div className="leiste">
@@ -251,6 +249,13 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
       <main className="flaeche">
         {/* Zurück: links oben neben der Scheibe, nicht bei Zahlen oder Tabelle */}
         {!aktiv && <button className="zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>}
+        {/* Spiele: nur die Scheibe – oben links Dart zurücknehmen, oben rechts zurück zum Spielstand */}
+        {aktiv && !tafel && e.darts.length > 0 && (
+          <button className="icon scheibe-knopf links" onClick={e.rueckgaengig} aria-label="Letzten Dart zurücknehmen">↶</button>
+        )}
+        {aktiv && !tafel && (
+          <button className="icon scheibe-knopf rechts" onClick={() => setTafel(true)} aria-label="Spielstand zeigen">📋</button>
+        )}
         <Scheibe ziel={e.ziel} flash={e.flash} onHit={e.treffer} />
         {e.flash && <div key={e.flash.key} className="ansage">{hitLabelLang(e.flash.hit)}</div>}
         {e.ersetzen !== null && <div className="hinweis-oben">Tippe das richtige Feld für Dart {e.ersetzen + 1}</div>}
