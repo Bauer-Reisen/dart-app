@@ -3,6 +3,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { checkout, wegText } from './checkout';
 import { THEMEN } from './tipps';
 
+const APP_URL = 'https://bauer-reisen.github.io/dart-app/';
+
+async function teilen() {
+  try {
+    if (navigator.share) { await navigator.share({ title: 'Dart-Training', text: 'Dart-Training: Würfe eintippen, Statistik, Tipps', url: APP_URL }); return; }
+    await navigator.clipboard.writeText(APP_URL);
+    alert('Link kopiert.');
+  } catch (err) {
+    if ((err as Error)?.name !== 'AbortError') alert('Link: ' + APP_URL);
+  }
+}
+
 export function Tipps({ onRundgang }: { onRundgang: () => void }) {
   const [offen, setOffen] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
@@ -77,6 +89,14 @@ export function Tipps({ onRundgang }: { onRundgang: () => void }) {
         Passende Tipps zu deinem eigenen Wurfbild findest du in der Statistik und im Training unter 💡.
       </p>
       <button className="btn breit" onClick={onRundgang}>Rundgang durch die App ansehen</button>
+
+      <div className="karte weitergeben">
+        <h3>App weitergeben</h3>
+        <img className="qr" src="img/qr.svg" alt="QR-Code zur App" width={200} height={200} />
+        <p className="info klein"><a href={APP_URL}>{APP_URL.replace('https://', '')}</a></p>
+        <button className="btn an" onClick={teilen}>Link teilen</button>
+        <p className="info klein">Mit der Handy-Kamera scannen – fertig.</p>
+      </div>
     </div>
   );
 }

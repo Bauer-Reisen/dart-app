@@ -22,6 +22,13 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.16.1', titel: 'App weitergeben',
+    rundgang: 'klein',
+    punkte: [
+      <>Unter <b>Tipps</b> ganz unten gibt es jetzt einen <b>QR-Code</b>: Mitspieler scannen ihn mit der Kamera und haben die App.</>,
+    ],
+  },
+  {
     v: '0.16.0', titel: '⏱ Timer im Training',
     rundgang: ['training'],
     punkte: [

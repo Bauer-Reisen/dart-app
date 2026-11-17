@@ -636,3 +636,8 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 @media (min-width: 700px) and (orientation: portrait), (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
   .icon.uhr { min-width: 60px; font-size: 22px; }
 }
+
+/* App weitergeben (QR-Code wie Film-App) */
+.weitergeben { text-align: center; margin-top: 16px; }
+.weitergeben .qr { display: block; margin: 6px auto 8px; width: 200px; height: 200px; border-radius: 8px; background: #fff; padding: 6px; }
+.weitergeben a { color: var(--akzent); }
