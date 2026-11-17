@@ -1,3 +1,4 @@
+import { nachOben } from './oben';
 import { useEffect, useState } from 'react';
 import { Reiterleiste, Start, type Reiter } from './Start';
 import { Statistik } from './Statistik';
@@ -67,7 +68,7 @@ export function App() {
   });
 
   // Jede neue Seite beginnt oben (sonst bleibt die Scroll-Position der vorigen Seite stehen)
-  useEffect(() => { window.scrollTo(0, 0); }, [ansicht]);
+  useEffect(() => { nachOben(); }, [ansicht]);
 
   // Bildschirm anlassen, solange die App offen ist
   useEffect(() => {
@@ -129,7 +130,7 @@ export function App() {
 
   function reiterWaehlen(r: Reiter) {
     setReiter(r);
-    window.scrollTo(0, 0);
+    nachOben();
     try { localStorage.setItem('dart-reiter', r); } catch { /* egal */ }
   }
   const gemeinsam = { aufnahmen, hinzufuegen, letzteEntfernen, onMenu: zumStart };

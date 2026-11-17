@@ -1,4 +1,5 @@
 // Einmalig auswählen: Bezirk → Liga → Mannschaft → eigener Name (Daten live von nuLiga über den Liga-Vermittler).
+import { nachOben } from './oben';
 import { useEffect, useState } from 'react';
 import type { NuLigaVerbindung } from './liga';
 import { nuLigaHolen } from './nuligaImport';
@@ -36,7 +37,7 @@ export function NuLigaVerbinden({ onFertig, onAbbruch }: { onFertig: (v: NuLigaV
     return () => { aktiv = false; };
   }, [schritt, region, staffel, team]);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [schritt]);
+  useEffect(() => { nachOben(); }, [schritt]);
 
   function zurueck() {
     if (team) setTeam(null);

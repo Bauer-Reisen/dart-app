@@ -1,3 +1,4 @@
+import { nachOben } from './oben';
 import { SpielerLeiste } from './SpielerWahl';
 import { anzeigeName } from './spieler';
 import { ICH } from './speicher';
@@ -77,7 +78,7 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, o
   }, []);
 
   // Beim Wechsel zwischen Übersicht, Verbinden und Spieltag immer oben anfangen
-  useEffect(() => { window.scrollTo(0, 0); }, [verbinden, bearbeiten?.id]);
+  useEffect(() => { nachOben(); }, [verbinden, bearbeiten?.id]);
 
   if (verbinden) {
     return (
@@ -102,7 +103,7 @@ export function Liga({ aufnahmen, ich, onTraining, onNeu, onComputer, laufend, o
         onFertig={(st) => {
           if (st) setzen({ ...daten, spieltage: [...daten.spieltage.filter((s) => s.id !== st.id), st] });
           setBearbeiten(null);
-          window.scrollTo(0, 0);
+          nachOben();
         }}
         onLoeschen={() => {
           setzen({ ...daten, spieltage: daten.spieltage.filter((s) => s.id !== bearbeiten.id) });
