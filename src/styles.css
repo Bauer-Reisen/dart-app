@@ -532,98 +532,12 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 @media (min-width: 700px) and (orientation: portrait) { .zurueck { width: 60px; height: 60px; font-size: 30px; } }
 @media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) { .zurueck { width: 60px; height: 60px; font-size: 30px; top: 12px; } }
 
-/* ---------- Spiele: nur Spielstand, Scheibe per 🎯 (alle Formate) ---------- */
-.app.spiel .kopf { order: -1; }
-.app.spiel .spiel-zurueck, .app.spiel .spiel-wechsel { flex: none; }
-.app.spiel .spiel-wechsel { margin-left: auto; }
-.app.spiel .chips { margin-left: 0; width: auto; }
-
-/* Spielstand über den ganzen Bildschirm */
-.app.zeige-tafel {
-  display: flex; flex-direction: column; max-width: none;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
-}
-.app.zeige-tafel .kopf { flex-wrap: nowrap; height: auto; min-height: 56px; padding-top: 6px; }
-.app.zeige-tafel .leiste, .app.zeige-tafel .flaeche, .app.zeige-tafel .fuss { display: none; }
-.app.zeige-tafel .oben { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
-.app.zeige-tafel .snackbar { left: 50%; right: auto; transform: translateX(-50%); width: min(92vw, 480px); bottom: calc(14px + env(safe-area-inset-bottom)); }
-
-/* 501/301: hochkant untereinander, quer nebeneinander */
-.app.zeige-tafel .tafel { flex: 1; min-height: 0; grid-auto-rows: 1fr; }
-.app.zeige-tafel .spieler, .app.zeige-tafel .tafel.n1 .spieler {
-  display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 6px 10px; border-width: 3px;
-}
-.app.zeige-tafel .sp-name { font-size: clamp(16px, 3.4vmin, 34px); }
-.app.zeige-tafel .sp-av { font-size: clamp(13px, 2.6vmin, 26px); }
-.app.zeige-tafel .sp-rest, .app.zeige-tafel .tafel.n1 .sp-rest { line-height: 1; }
-@media (orientation: portrait) {
-  .app.zeige-tafel .tafel { grid-template-columns: 1fr; }
-  .app.zeige-tafel .sp-rest, .app.zeige-tafel .tafel.n1 .sp-rest { font-size: min(calc(50vh / var(--n)), 42vw); }
-}
-@media (orientation: landscape) {
-  .app.zeige-tafel .sp-rest, .app.zeige-tafel .tafel.n1 .sp-rest { font-size: min(calc(85vw / var(--n) / 2), 50vh); }
-}
-
-/* Cricket und Halve-It: Tabelle füllt die Fläche */
-.app.zeige-tafel .oben > table.ctafel { flex: 1; height: 100%; }
-.app.zeige-tafel .ctafel td { height: auto; }
-@media (orientation: portrait), (min-height: 600px) {
-  .app.zeige-tafel .ctafel.normal { display: none; }
-  .app.zeige-tafel .ctafel.gedreht { display: table; }
-}
-@media (orientation: landscape) and (max-height: 599px) {
-  .app.zeige-tafel .ctafel.gedreht { display: none; }
-  .app.zeige-tafel .ctafel.normal { display: table; }
-  .app.zeige-tafel .ctafel.normal td { font-size: min(12vh, 4.5vw); }
-  .app.zeige-tafel .ctafel.normal th { font-size: min(8vh, 3vw); }
-  .app.zeige-tafel .ctafel.normal .cname { font-size: min(7vh, 2.6vw) !important; }
-  .app.zeige-tafel .ctafel.normal .cpkt { font-size: min(10vh, 3.6vw) !important; }
-}
-.app.zeige-tafel .ctafel.gedreht td { font-size: min(6.5vh, 12vw); }
-.app.zeige-tafel .ctafel.gedreht th.cnr { font-size: min(4.5vh, 8vw); }
-.app.zeige-tafel .ctafel.gedreht th.cname { font-size: min(3.6vh, 5vw) !important; }
-.app.zeige-tafel .ctafel.gedreht .cpkt { font-size: min(5vh, 7vw) !important; }
-.app.zeige-tafel .ctafel.htafel th { font-size: min(3vh, 3vw); }
-.app.zeige-tafel .ctafel.htafel td.hwert { font-size: min(5vh, 3.4vw); }
-.app.zeige-tafel .ctafel.htafel td.halb { font-size: min(6vh, 4.2vw); }
-.app.zeige-tafel .ctafel.htafel .cname { font-size: min(4vh, 3.4vw) !important; }
-.app.zeige-tafel .htafel .cpkt { font-size: min(6vh, 4.4vw) !important; }
-.app.zeige-tafel .kopf-info strong { font-size: clamp(22px, 5vmin, 52px); }
-.app.zeige-tafel .doppel-frage { font-size: clamp(15px, 2.6vmin, 22px); }
-
-/* Nur die Scheibe, so groß wie möglich – sonst nichts */
-.app.zeige-scheibe {
-  display: flex; flex-direction: column; max-width: none;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-.app.zeige-scheibe .oben, .app.zeige-scheibe .kopf, .app.zeige-scheibe .leiste,
-.app.zeige-scheibe .fuss, .app.zeige-scheibe .snackbar { display: none; }
-.app.zeige-scheibe .flaeche { flex: 1; height: auto; min-height: 0; }
-.scheibe-knopf { position: absolute; top: 6px; z-index: 3; opacity: .9; }
-.scheibe-knopf.links { left: 6px; }
-.scheibe-knopf.rechts { right: 6px; }
-
-/* Halve-It gedreht (nur in der Spielstand-Ansicht) */
-.htafel.gedreht th:last-child { width: auto; }
-.app.zeige-tafel .ctafel.htafel.gedreht td.hwert { font-size: min(5vh, calc(80vw / var(--n, 1) / 2.4)); }
-.app.zeige-tafel .ctafel.htafel.gedreht td.halb { font-size: min(5.5vh, calc(80vw / var(--n, 1) / 2)); }
-.app.zeige-tafel .ctafel.htafel.gedreht th.cnr { font-size: min(3.4vh, 5.5vw); }
-.app.zeige-tafel .ctafel.htafel.gedreht th.cname { font-size: min(3.4vh, 5vw) !important; }
-.app.zeige-tafel .ctafel.htafel.gedreht .cpkt { font-size: min(5.5vh, calc(80vw / var(--n, 1) / 2.2)) !important; }
-.app.zeige-tafel .ctafel.htafel.normal td.hwert { font-size: min(10vh, 3.4vw); }
-.app.zeige-tafel .ctafel.htafel.normal td.halb { font-size: min(11vh, 4.2vw); }
-.app.zeige-tafel .ctafel.htafel.normal th { font-size: min(6vh, 3vw); }
-.app.zeige-tafel .ctafel.htafel.normal .cname { font-size: min(8vh, 2.8vw) !important; }
-.app.zeige-tafel .ctafel.htafel.normal .cpkt { font-size: min(11vh, 4.4vw) !important; }
-
 /* 501: Spiel-Average und letzte Aufnahmen */
 .sp-spiel { white-space: nowrap; }
 .sp-letzte { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; min-height: 1.4em; font-size: 12px; color: var(--leise); }
 .sp-letzte span { background: #2a2a2a; border-radius: 6px; padding: 0 6px; font-weight: 700; }
 .sp-letzte span.neu { color: var(--text); }
 .tafel.n1 .sp-letzte { justify-content: flex-end; }
-.app.zeige-tafel .sp-letzte { font-size: clamp(14px, 3vmin, 30px); gap: 0.4em; margin-top: 0.3em; }
-.app.zeige-tafel .sp-letzte span { padding: 0.05em 0.45em; border-radius: 0.3em; }
 
 /* ⏱ Trainings-Timer */
 .icon.uhr { width: auto; min-width: 44px; padding: 0 8px; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 18px; }

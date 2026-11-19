@@ -22,6 +22,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.17.0', titel: 'Scheibe und Spielstand wieder zusammen',
+    rundgang: ['spiele'],
+    punkte: [
+      <>In den Spielen siehst du wieder <b>Scheibe und Spielstand auf einer Seite</b> – wie vorher. Der Average und die letzten drei Aufnahmen bei 501/301 bleiben.</>,
+      <>Vertippt? Mit <b>↶ Zurück</b> unten nimmst du Dart für Dart zurück, auch über mehrere Aufnahmen und Spieler hinweg.</>,
+    ],
+  },
+  {
     v: '0.16.1', titel: 'App weitergeben',
     rundgang: 'klein',
     punkte: [
@@ -197,8 +205,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Oben in Training, Spiele, Liga und Statistik steht <b>Es wirft: …</b>. Tippe drauf, um den Spieler zu wechseln oder neue anzulegen – praktisch, wenn mehrere ein Gerät nutzen. Jeder hat seine eigene Statistik und seine eigene Liga.</>,
   },
   {
-    id: 'spiele', stand: '0.14.0', icon: '🎮', titel: 'Spiele',
-    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote. Im Spiel siehst du nur den <b>Spielstand</b> – zum Werfen oben rechts auf <b>🎯</b> tippen, dann ist die Scheibe groß.</>,
+    id: 'spiele', stand: '0.17.0', icon: '🎮', titel: 'Spiele',
+    text: <>501/301, Cricket und Halve-It – allein, mit bis zu 4 Spielern oder bei 501 gegen den <b>Computer</b>. Die App rechnet mit und schlägt den Checkout-Weg vor. Bei 501 sagt sie auf Wunsch die Punkte an („you require 32“). Ziele wählst du nur im Training – im Spiel zählt einfach, wo der Dart steckt. Konntest du ausmachen, fragt sie kurz, <b>wie viele Darts aufs Doppel</b> gingen – für eine ehrliche Doppelquote. Bei 501/301 stehen unter dem Rest der Average und die letzten drei Aufnahmen. Mit <b>↶ Zurück</b> nimmst du Dart für Dart zurück – auch über mehrere Aufnahmen.</>,
   },
   {
     id: 'liga', stand: '0.7.0', icon: '🏆', titel: 'Liga',

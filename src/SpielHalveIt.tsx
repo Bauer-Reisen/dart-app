@@ -72,45 +72,8 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
       : <><b>Kein Treffer!</b> {letzte.spieler} halbiert auf {stand.punkte[wer]}</>;
   }
 
-  const am = (i: number) => i === s && !stand.fertig;
-  const legsText = (i: number) => (match.legs.length > 1 || siege[i] ? <span className="legs"> · {siege[i]}</span> : null);
-  // Hochkant und auf dem Tablet: Runden untereinander, Spieler nebeneinander
-  const gedreht = (
-    <table className="ctafel htafel gedreht" style={{ '--n': n } as React.CSSProperties}>
-      <thead>
-        <tr>
-          <th />
-          {match.spieler.map((name, i) => (
-            <th key={i} className={'cname' + (am(i) ? ' amzug' : '')}>{name}{legsText(i)}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {RUNDEN.map((r, j) => (
-          <tr key={j}>
-            <th className={'cnr' + (j === stand.runde && !stand.fertig ? ' jetzt' : '')}>{rundenKurz(r)}</th>
-            {match.spieler.map((_, i) => {
-              const v = stand.verlauf[i][j];
-              return (
-                <td key={i} className={'hwert' + (v === 0 ? ' halb' : '') + (am(i) ? ' amzug' : '')}>
-                  {v === undefined ? '' : v === 0 ? '½' : v}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
-        <tr>
-          <th className="cnr">Pkt</th>
-          {match.spieler.map((_, i) => (
-            <td key={i} className={'cpkt' + (am(i) ? ' amzug' : '')}>{stand.punkte[i]}</td>
-          ))}
-        </tr>
-      </tbody>
-    </table>
-  );
-
-  const oben = (<>{gedreht}
-    <table className="ctafel htafel normal">
+  const oben = (
+    <table className="ctafel htafel">
       <thead>
         <tr>
           <th />
@@ -137,7 +100,7 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
         ))}
       </tbody>
     </table>
-  </>);
+  );
 
   const overlay = stand.fertig && (() => {
     const rang = match.spieler.map((nm, i) => ({ nm, p: stand.punkte[i], h: stand.halbiert[i] })).sort((a, b) => b.p - a.p);
@@ -173,7 +136,6 @@ export function HalveItSpiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEn
       tipp={{ art: 'halveit', darts: dartsVon(aufnahmen, match.spieler[s]), aufnahmen: aufnahmenVon(aufnahmen, match.spieler[s]) }}
       onMenu={onMenu}
       oben={oben}
-      wechsel
       snackText={snack}
       overlay={overlay || undefined}
       kopfInfo={

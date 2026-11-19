@@ -187,30 +187,19 @@ interface ViewProps {
   overlay?: ReactNode;
   /** 💡-Knopf: Tipps zur Übung und zum eigenen Wurfbild. */
   tipp?: TippQuelle;
-  /** Spiele: nur der Spielstand; die Scheibe öffnet sich per 🎯-Knopf. */
-  wechsel?: boolean;
   /** Training und Übungen: ⏱-Timer (5/10/15 Min.). */
   uhr?: UhrOpts;
 }
 
-export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp, wechsel, uhr }: ViewProps) {
+export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tipp, uhr }: ViewProps) {
   const sichtbar = e.darts.length ? e.darts : e.zuletzt ?? [];
   const t = useTipp(tipp, e.ziel);
   const u = useUhr(uhr);
 
-  // Spiele: Solange keiner wirft, nur der Spielstand (Start und nach jeder Aufnahme).
-  // 🎯 öffnet die Scheibe, 📋 zeigt wieder den Spielstand. Der erste Dart lässt die Scheibe offen.
-  const aktiv = !!wechsel && !!oben;
-  const [tafel, setTafel] = useState(() => e.darts.length === 0);
-  useEffect(() => { if (e.zuletzt && !e.darts.length) setTafel(true); }, [e.zuletzt, e.darts.length]);
-  useEffect(() => { if (e.darts.length) setTafel(false); }, [e.darts.length]);
-  const klasse = aktiv ? (tafel ? ' spiel zeige-tafel' : ' spiel zeige-scheibe') : '';
-
   return (
-    <div className={'app' + klasse}>
+    <div className="app">
       {oben && <div className="oben">{oben}</div>}
       <header className="kopf">
-        {aktiv && <button className="icon spiel-zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>}
         <div className="kopf-info">{kopfInfo}</div>
         {e.zielAnzeige === 'fest' && (
           <div className="chips">
@@ -229,7 +218,6 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
           ))}
           <button className="chip plus" onClick={() => e.setWahlOffen(true)} aria-label="Anderes Ziel">＋</button>
         </div>}
-        {aktiv && tafel && <button className="icon spiel-wechsel" onClick={() => setTafel(false)} aria-label="Scheibe öffnen">🎯</button>}
       </header>
 
       <div className="leiste">
@@ -253,14 +241,7 @@ export function EingabeView({ e, onMenu, kopfInfo, oben, snackText, overlay, tip
 
       <main className="flaeche">
         {/* Zurück: links oben neben der Scheibe, nicht bei Zahlen oder Tabelle */}
-        {!aktiv && <button className="zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>}
-        {/* Spiele: nur die Scheibe – oben links Dart zurücknehmen, oben rechts zurück zum Spielstand */}
-        {aktiv && !tafel && e.darts.length > 0 && (
-          <button className="icon scheibe-knopf links" onClick={e.rueckgaengig} aria-label="Letzten Dart zurücknehmen">↶</button>
-        )}
-        {aktiv && !tafel && (
-          <button className="icon scheibe-knopf rechts" onClick={() => setTafel(true)} aria-label="Spielstand zeigen">📋</button>
-        )}
+        <button className="zurueck" onClick={onMenu} aria-label="Zurück zum Menü">←</button>
         <Scheibe ziel={e.ziel} flash={e.flash} onHit={e.treffer} />
         {e.flash && <div key={e.flash.key} className="ansage">{hitLabelLang(e.flash.hit)}</div>}
         {e.ersetzen !== null && <div className="hinweis-oben">Tippe das richtige Feld für Dart {e.ersetzen + 1}</div>}
