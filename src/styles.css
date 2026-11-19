@@ -440,9 +440,11 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
 .hilfe-box ul { padding-left: 20px; margin: 6px 0; }
 .hilfe-icon { font-size: 44px; text-align: center; margin-top: 4px; }
 .hilfe-box > h3 { text-align: center; }
-.hilfe-punkte { display: flex; justify-content: center; gap: 6px; margin: 14px 0; }
-.hilfe-punkte span { width: 8px; height: 8px; border-radius: 50%; background: var(--fl2); }
-.hilfe-punkte span.an { background: var(--akzent); }
+.hilfe-punkte { display: flex; justify-content: center; flex-wrap: wrap; margin: 10px 0 4px; }
+.hilfe-punkte button { width: 32px; height: 32px; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; }
+.hilfe-punkte button span { width: 10px; height: 10px; border-radius: 50%; background: var(--fl2); }
+.hilfe-punkte button.an span { background: var(--akzent); transform: scale(1.3); }
+.hilfe-ueberspringen { display: block; margin: 0 auto 10px; background: none; border: 0; color: var(--leise); font-size: 14px; text-decoration: underline; padding: 6px; }
 .hilfe-knoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .hilfe-knoepfe .btn { padding: 12px; }
 

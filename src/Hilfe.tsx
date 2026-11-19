@@ -242,10 +242,15 @@ export function Rundgang({ onFertig }: { onFertig: () => void }) {
         <h3>{k.titel}</h3>
         <p>{k.text}</p>
         <p className="hilfe-punkte" aria-label={`Schritt ${i + 1} von ${KARTEN.length}`}>
-          {KARTEN.map((_, j) => <span key={j} className={j === i ? 'an' : ''} />)}
+          {KARTEN.map((_, j) => (
+            <button key={j} className={j === i ? 'an' : ''} onClick={() => setI(j)} aria-label={`Zu Schritt ${j + 1}`}><span /></button>
+          ))}
         </p>
+        {i > 0 && <button className="hilfe-ueberspringen" onClick={fertig}>Rundgang überspringen</button>}
         <div className="hilfe-knoepfe">
-          <button className="btn" onClick={fertig}>Überspringen</button>
+          {i === 0
+            ? <button className="btn" onClick={fertig}>Überspringen</button>
+            : <button className="btn" onClick={() => setI(i - 1)}>← Zurück</button>}
           <button className="btn an" onClick={() => (letzte ? fertig() : setI(i + 1))}>{letzte ? 'Los geht’s' : 'Weiter'}</button>
         </div>
       </div>
