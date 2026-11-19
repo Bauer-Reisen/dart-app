@@ -22,6 +22,14 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.18.0', titel: '501: Darts und Doppelquote',
+    rundgang: 'klein',
+    punkte: [
+      <>Auf der Spielerkarte steht jetzt klein, wie viele <b>Darts</b> du im Leg geworfen hast und deine <b>Doppelquote</b> im Spiel, z. B. „12 Darts · Doppel 1/4“.</>,
+      <>Allein gespielt ist die Karte jetzt aufgeräumter: Name und Rest oben, darunter Average und letzte Aufnahmen.</>,
+    ],
+  },
+  {
     v: '0.17.0', titel: 'Scheibe und Spielstand wieder zusammen',
     rundgang: ['spiele'],
     punkte: [

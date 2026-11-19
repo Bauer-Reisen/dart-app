@@ -566,3 +566,12 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
   padding-bottom: 24px;
 }
 .reiter { position: relative; flex: none; }
+.sp-info { font-size: 11px; color: var(--leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tafel.n1 .spieler { display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 10px; row-gap: 2px; text-align: left; }
+.tafel.n1 .sp-rest { text-align: right; }
+.tafel.n1 .sp-av { text-align: left; }
+.tafel.n1 .sp-info { grid-column: 1 / -1; text-align: left; }
+@media (min-width: 700px) and (orientation: portrait), (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
+  .sp-info { font-size: 14px; }
+  .sp-letzte { font-size: 15px; }
+}

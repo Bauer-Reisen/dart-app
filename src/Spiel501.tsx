@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ansageLaden, ansageMoeglich, ansageSpeichern, entsperren, punkteText, requireText, sprich, stimmeLaden, stimmen, stimmeSpeichern, type AnsageArt } from './ansage';
 import type { Ziel } from './board';
 import { naechsterDart, wegText } from './checkout';
-import { doppelFrage, type DoppelFrage } from './doppel';
+import { doppelFrage, doppelWerte, type DoppelFrage } from './doppel';
 import { EingabeView, useEingabe } from './Eingabe';
 import { computerAufnahme, sigmaFuer } from './gegner';
 import { simulationMerken } from './liga';
@@ -459,6 +459,15 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
         return w.bust ? 'Bust' : String(w.punkte);
       });
 
+  // Doppelquote im ganzen Spiel (Angabe nach der Aufnahme, sonst Schätzung)
+  const doppelImSpiel = match.spieler.map(() => ({ vers: 0, treff: 0 }));
+  for (const l of match.legs) {
+    aufnahmen.filter((a) => a.legId === l.id).forEach((a, k) => {
+      const w = doppelWerte(a); const d = doppelImSpiel[(l.starter + k) % n];
+      d.vers += w.vers; d.treff += w.treff;
+    });
+  }
+
   const oben = (
     <>
     <div className={'tafel n' + n}>
@@ -477,6 +486,9 @@ export function X01Spiel({ match, setMatch, aufnahmen, hinzufuegen, letzteEntfer
             </div>
             <div className="sp-letzte" aria-label="Letzte Aufnahmen">
               {letzteAufnahmen(i).map((p, k) => <span key={k} className={k === 0 ? 'neu' : ''}>{p}</span>)}
+            </div>
+            <div className="sp-info">
+              {stand.darts[i]} Darts{doppelImSpiel[i].vers > 0 && <> · Doppel {doppelImSpiel[i].treff}/{doppelImSpiel[i].vers}</>}
             </div>
           </div>
         );
