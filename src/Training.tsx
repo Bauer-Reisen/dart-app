@@ -1,6 +1,6 @@
 // Zieltraining: freies Werfen auf ein selbst gewähltes Ziel – frei oder geführt (Vorschlag aus dem Trefferbild).
 import { useEffect, useRef, useState } from 'react';
-import { FOKUS_DAUER, zuruf, zurufeAn, zurufeSetzen, type Zuruf } from './coach';
+import { FOKUS_DAUER, fokusZwischenstand, zuruf, zurufeAn, zurufeSetzen, type Zuruf } from './coach';
 import { sameZiel, zielLabel, type Ziel } from './board';
 import { EingabeView, summe, useEingabe } from './Eingabe';
 import { uhrInfo } from './UhrKnopf';
@@ -111,7 +111,7 @@ export function Training({ aufnahmen, hinzufuegen, letzteEntfernen, onMenu, spie
           )}
           {zSichtbar && (
             <div className={'zuruf ' + zSichtbar.art} role="status">
-              <span><b>Trainer:</b> {zSichtbar.text}{zSichtbar.art === 'fokus' && <> <small>(Aufnahme {Math.min(sitzung.length - zSichtbar.bei + 1, FOKUS_DAUER)} von {FOKUS_DAUER})</small></>}</span>
+              <span><b>Trainer:</b> {zSichtbar.text}{zSichtbar.art === 'fokus' && <> <small>(Aufnahme {Math.min(sitzung.length - zSichtbar.bei + 1, FOKUS_DAUER)} von {FOKUS_DAUER})</small>{(() => { const zw = fokusZwischenstand(sitzung, zSichtbar); return zw && <small className="zw">{zw}</small>; })()}</>}</span>
               <button onClick={() => setZr(null)} aria-label="Zuruf schließen">✕</button>
             </div>
           )}

@@ -9,6 +9,7 @@ import { zielPunkt } from './gegner';
 import { klasse } from './klassen';
 import type { Aufnahme, Dart } from './speicher';
 import { RAT, richtung, wurfbild, wurfbildTipps, type Richtung } from './tipps';
+import { bilanz, block, zwischenstand, type Block } from './fortschritt';
 
 export interface CoachTipp {
   id: string;
@@ -388,7 +389,13 @@ export function allgemeineTipps(aufnahmen: Aufnahme[]): CoachTipp[] {
 
 // ===================== Zurufe während des Trainings =====================
 
-export interface Zuruf { text: string; art: 'serie' | 'pause' | 'lob' | 'fokus' | 'bilanz'; bei: number }
+export interface Zuruf {
+  text: string; art: 'serie' | 'pause' | 'lob' | 'fokus' | 'bilanz'; bei: number;
+  /** Fokus: welcher Tipp (id) und welcher Ansatz davon; Richtung für die Auswertung. */
+  tipp?: string; variante?: number; richtung?: Richtung;
+  /** Bilanz: hat der Fokus erkennbar geholfen? */
+  geholfen?: boolean;
+}
 
 export const ZURUF_ABSTAND = 4;  // mindestens so viele Aufnahmen zwischen zwei Zurufen
 export const FOKUS_ALLE = 8;     // ohne anderen Anlass: alle so viele Aufnahmen ein Fokus-Punkt
@@ -417,16 +424,11 @@ export function zuruf(sitzung: Aufnahme[], alle: Dart[], verlauf: Zuruf[], mitFo
   const zuletzt = (art: Zuruf['art']) => [...verlauf].reverse().find((z) => z.art === art);
   const frei = (art: Zuruf['art']) => { const z = zuletzt(art); return !z || i - z.bei >= GLEICH_ABSTAND; };
 
-  // Bilanz nach einer Fokus-Strecke
+  // Bilanz nach einer Fokus-Strecke – mit Trefferbild: Abstand, knapp/weit, Richtung, Streuung
   if (letzter?.art === 'fokus' && i === letzter.bei + FOKUS_DAUER) {
-    const mit = quoteVon(sitzung.slice(letzter.bei, i));
-    const ohne = quoteVon(sitzung.slice(Math.max(0, letzter.bei - FOKUS_DAUER), letzter.bei));
-    const d = q(mit) - q(ohne);
-    const text = ohne.n < 6 ? `Mit Fokus: ${mit.t} von ${mit.n} getroffen.`
-      : d >= 0.07 ? `Mit dem Fokus besser: ${mit.t} von ${mit.n} getroffen, vorher ${ohne.t} von ${ohne.n}. Behalte das bei!`
-      : d <= -0.07 ? `Mit Fokus ${mit.t} von ${mit.n}, vorher ${ohne.t} von ${ohne.n}. Eine Umstellung kostet am Anfang oft etwas – dranbleiben.`
-      : `Mit Fokus ${mit.t} von ${mit.n}, vorher ${ohne.t} von ${ohne.n} – ungefähr gleich.`;
-    return { text, art: 'bilanz', bei: i };
+    const { mit, ohne } = fokusBloecke(sitzung, letzter);
+    const b = bilanz(mit, ohne, letzter.richtung);
+    return { text: b.text, art: 'bilanz', bei: i, tipp: letzter.tipp, geholfen: b.geholfen };
   }
   if (letzter && i - letzter.bei < ZURUF_ABSTAND) return null;
   // Während einer Fokus-Strecke nicht dazwischenreden
@@ -454,16 +456,62 @@ export function zuruf(sitzung: Aufnahme[], alle: Dart[], verlauf: Zuruf[], mitFo
     }
   }
 
-  // Fokus-Punkt: persönlich aus dem Wurfbild, sonst reihum allgemein
+  // Fokus-Punkt: persönlich aus dem Wurfbild (dieses Trainings, sonst von früher), sonst reihum allgemein
   const letzterFokus = zuletzt('fokus');
   if (mitFokus && i - (letzterFokus?.bei ?? 0) >= FOKUS_ALLE) {
-    const nr = verlauf.filter((z) => z.art === 'fokus').length;
+    const fokusse = verlauf.filter((z) => z.art === 'fokus');
+    const nr = fokusse.length;
     const ziel = sitzung[i - 1].darts[0]?.ziel;
-    const eigen = ziel ? zielTipps(alle, ziel).find((t) => !t.lob) : undefined;
-    const text = eigen && nr % 2 === 0 ? `Diese ${FOKUS_DAUER} Aufnahmen: ${eigen.zuruf}` : ALLGEMEIN[nr % ALLGEMEIN.length];
-    return { text, art: 'fokus', bei: i };
+    const eigen = ziel && nr % 3 !== 2 ? naechsterTipp(sitzung, alle, ziel, verlauf) : null;
+    if (eigen) return { text: `Diese ${FOKUS_DAUER} Aufnahmen: ${eigen.text}`, art: 'fokus', bei: i, tipp: eigen.id, variante: eigen.variante, richtung: eigen.richtung };
+    const allg = fokusse.filter((z) => !z.tipp).length;
+    return { text: ALLGEMEIN[allg % ALLGEMEIN.length], art: 'fokus', bei: i };
   }
   return null;
+}
+
+/** Aufnahmen mit Fokus und die gleich vielen davor (zum Vergleich). */
+export function fokusBloecke(sitzung: Aufnahme[], f: Zuruf): { mit: Block; ohne: Block } {
+  return {
+    mit: block(sitzung.slice(f.bei, f.bei + FOKUS_DAUER)),
+    ohne: block(sitzung.slice(Math.max(0, f.bei - FOKUS_DAUER), f.bei)),
+  };
+}
+
+/** Zwischenstand während einer Fokus-Strecke (für die Leiste), sonst null. */
+export function fokusZwischenstand(sitzung: Aufnahme[], f: Zuruf): string | null {
+  if (f.art !== 'fokus' || sitzung.length <= f.bei) return null;
+  const { mit, ohne } = fokusBloecke(sitzung, f);
+  return zwischenstand(mit, ohne, f.richtung);
+}
+
+/**
+ * Welcher persönliche Tipp als Nächstes? Ein Tipp, der geholfen hat, ist für dieses Training erledigt.
+ * Hat er nicht geholfen, kommt beim nächsten Mal ein anderer Ansatz für dasselbe Problem (nächster „Probier“-Punkt).
+ * Noch nicht versuchte Tipps gehen vor.
+ */
+function naechsterTipp(sitzung: Aufnahme[], alle: Dart[], ziel: Ziel, verlauf: Zuruf[]): { id: string; text: string; variante: number; richtung?: Richtung } | null {
+  const hier = sitzung.flatMap((a) => a.darts).filter((d) => sameZiel(d.ziel, ziel));
+  const quelle = hier.filter((d) => d.p).length >= MIN_LAGE ? hier : alle;
+  const tipps = zielTipps(quelle, ziel).filter((t) => !t.lob);
+  const kandidaten: { t: CoachTipp; variante: number; neu: boolean }[] = [];
+  for (const t of tipps) {
+    const versuche = verlauf.filter((z) => z.art === 'fokus' && z.tipp === t.id);
+    const bilanzen = verlauf.filter((z) => z.art === 'bilanz' && z.tipp === t.id);
+    if (bilanzen.some((b) => b.geholfen)) continue; // hat geholfen → erledigt
+    const ansaetze = ansaetzeVon(t);
+    if (versuche.length >= ansaetze.length) continue; // alle Ansätze probiert
+    kandidaten.push({ t, variante: versuche.length, neu: versuche.length === 0 });
+  }
+  const k = kandidaten.find((x) => x.neu) ?? kandidaten[0];
+  if (!k) return null;
+  return { id: k.t.id, text: ansaetzeVon(k.t)[k.variante], variante: k.variante, richtung: k.t.richtung };
+}
+
+/** Der kurze Zuruf und danach die einzelnen „Probier“-Punkte als weitere Ansätze. */
+function ansaetzeVon(t: CoachTipp): string[] {
+  return [t.zuruf, ...t.probier.filter((p) => !/^Immer nur eine Sache/.test(p))]
+    .filter((x, i, l) => l.indexOf(x) === i);
 }
 
 // ===================== Zurufe an/aus =====================

@@ -577,3 +577,6 @@ a.btn.breit { justify-content: center; box-sizing: border-box; }
   .sp-info { font-size: 14px; }
   .sp-letzte { font-size: 15px; }
 }
+
+/* Zwischenstand in der Fokus-Leiste */
+.zuruf .zw { display: block; margin-top: 2px; font-weight: 600; }

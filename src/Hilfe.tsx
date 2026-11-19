@@ -22,6 +22,15 @@ function setzen(s: Partial<HilfeStand>) {
 // ---------------- Was ist neu? (neueste oben, v = Version des Updates) ----------------
 export const NEUES: { v: string; titel: string; rundgang: KartenId[] | 'klein'; punkte: ReactNode[] }[] = [
   {
+    v: '0.19.0', titel: 'Trainer schaut aufs Trefferbild',
+    rundgang: ['training'],
+    punkte: [
+      <>Nach einem Fokus zählt der Trainer nicht mehr nur Treffer: Er sieht auch, ob deine Darts <b>näher am Ziel</b>, <b>enger zusammen</b> oder <b>in der richtigen Richtung</b> liegen – z. B. „vorher 12 mm zu tief, jetzt nur noch 4 mm“.</>,
+      <>Während des Fokus siehst du unter dem Tipp einen <b>Zwischenstand</b>, z. B. „Abstand 8 mm · vorher 13 mm“.</>,
+      <>Hat ein Tipp nicht geholfen, kommt beim nächsten Mal ein <b>anderer Ansatz</b> – keine Wiederholungen mehr.</>,
+    ],
+  },
+  {
     v: '0.18.0', titel: '501: Darts und Doppelquote',
     rundgang: 'klein',
     punkte: [
@@ -205,8 +214,8 @@ export const KARTEN: { id: KartenId; stand: string; icon: string; titel: string;
     text: <>Nach jedem Wurf tippst du auf der Scheibe an, <b>wo der Dart steckt</b> – möglichst genau an die Stelle und der Reihe nach, wie geworfen (Felder 1., 2., 3.). Daneben? Tippe außen in den grauen Rand. Ein Dart zählt, sobald du loslässt. Zum genauen Tippen ziehst du die Scheibe mit <b>zwei Fingern</b> auf. <b>↶ Zurück</b> nimmt den letzten Dart zurück, ein Tipp auf ein Feld oben ändert ihn.</>,
   },
   {
-    id: 'training', stand: '0.16.0', icon: '🏋️', titel: 'Training',
-    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wo deine Darts landen. Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b>, und sobald er dein Wurfbild kennt, macht er oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27. Mit <b>⏱</b> stellst du einen Timer auf 5, 10 oder 15 Minuten – anhalten geht auch.</>,
+    id: 'training', stand: '0.19.0', icon: '🏋️', titel: 'Training',
+    text: <><b>Zieltraining</b>: Ziel wählen und werfen – die App merkt sich, wo deine Darts landen. Während du wirfst, <b>ruft dir der Trainer ab und zu etwas zu</b> und schaut dabei auch, ob deine Darts näher ans Ziel rücken, und sobald er dein Wurfbild kennt, macht er oben einen <b>Trainingsvorschlag</b>. Dazu Doppeltraining, Around the Clock und Bob's 27. Mit <b>⏱</b> stellst du einen Timer auf 5, 10 oder 15 Minuten – anhalten geht auch.</>,
   },
   {
     id: 'wer', stand: '0.7.0', icon: '👥', titel: 'Wer wirft?',
